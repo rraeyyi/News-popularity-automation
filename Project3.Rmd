@@ -32,19 +32,26 @@ channel <- function(x){
                  "Number_Content_Words" = "n_tokens_content",
                  "Number_Images" = "num_imgs",
                  "Number_Videos" = "num_videos",
-                 "Published_Mon" = ends_with("monday"),
-                 "Published_Tues" = ends_with("tuesday"),
-                 "Published_Weds" = ends_with("wednesday"),
-                 "Published_Thurs" = ends_with("thursday"),
-                 "Published_Fri" = ends_with("friday"),
-                 "Published_Sat" = ends_with("saturday"),
-                 "Published_Sun" = ends_with("sunday"),
+                 starts_with("weekday_is"),
                  "Positive_Word_Rate" = "global_rate_positive_words",
                  "Negative_Word_Rate" = "global_rate_negative_words",
                  "Title_Polarity" = "title_sentiment_polarity",
                  "Shares" = "shares")
+  
+news$Weekday <- NA
+news$Weekday [news$weekday_is_monday==1] <- "Mon"
+news$Weekday [news$weekday_is_tuesday==1] <- "Tues"
+news$Weekday [news$weekday_is_wednesday==1] <- "Wed"
+news$Weekday [news$weekday_is_thursday==1] <- "Thurs"
+news$Weekday [news$weekday_is_friday==1] <- "Fri"
+news$Weekday [news$weekday_is_saturday==1] <- "Sat"
+news$Weekday [news$weekday_is_sunday==1] <- "Sun"
+news$Weekday <- as.factor(news$Weekday)
 
-return(news)
+news_final <- news %>%
+  select(-starts_with("weekday_is"))
+
+return(news_final)
 }
 ```
 
@@ -70,7 +77,15 @@ testing <- news_data[-intrain,]
 
 # Summarization
 ```{r}
-# Title length & polarity vs shares
+# Summary stats for all variables
+summary(training)
+
+# Boxplot of weekday vs shares
+ggplot(training, aes(x = Weekday, y = Shares)) +
+  geom_boxplot(color = "royal blue") +
+  scale_y_continuous(trans="log10")
+
+# Scatterplot of title length & polarity vs shares
 ggplot(training, aes(x = Number_Title_Words, y=Shares)) + 
   geom_point(aes(color = Title_Polarity))
 ```
