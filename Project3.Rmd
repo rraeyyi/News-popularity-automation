@@ -23,7 +23,7 @@ OnlineNewsPopularity <- read_csv("OnlineNewsPopularity.csv")
 OnlineNewsPopularity$url <- NULL
 channel <- function(x){
   base <- "data_channel_is_"
-  data <- paste0(base,x) %>% 
+  data <- paste0(base,x) %>%  
           noquote()
   news <- OnlineNewsPopularity %>% 
           filter(get(data) == 1) %>% 
