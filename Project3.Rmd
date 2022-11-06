@@ -1,0 +1,119 @@
+---
+title: "ST 558 Project 3"
+author: "Rachel Hencher and Yi Ren"
+date: "2022-11-02"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Load packages
+```{r, message=FALSE}
+library(readr)
+library(dplyr)
+library(caret)
+```
+
+# Data
+## Read in and subset data
+```{r}
+OnlineNewsPopularity <- read_csv("OnlineNewsPopularity.csv") 
+OnlineNewsPopularity$url <- NULL
+channel <- function(x){
+  base <- "data_channel_is_"
+  data <- paste0(base,x) %>%  
+          noquote()
+  news <- OnlineNewsPopularity %>% 
+          filter(get(data) == 1) %>% 
+          select("Number_Title_Words" = "n_tokens_title",
+                 "Number_Content_Words" = "n_tokens_content",
+                 "Number_Images" = "num_imgs",
+                 "Number_Videos" = "num_videos",
+                 "Published_Mon" = ends_with("monday"),
+                 "Published_Tues" = ends_with("tuesday"),
+                 "Published_Weds" = ends_with("wednesday"),
+                 "Published_Thurs" = ends_with("thursday"),
+                 "Published_Fri" = ends_with("friday"),
+                 "Published_Sat" = ends_with("saturday"),
+                 "Published_Sun" = ends_with("sunday"),
+                 "Positive_Word_Rate" = "global_rate_positive_words",
+                 "Negative_Word_Rate" = "global_rate_negative_words",
+                 "Title_Polarity" = "title_sentiment_polarity",
+                 "Shares" = "shares")
+
+return(news)
+}
+```
+
+## Choose an option for the `channel` function argument:  
+- *lifestyle*: Is the desired data channel lifestyle?  
+- *entertainment*: Is the desired data channel entertainment?  
+- *bus*: Is the desired data channel business?  
+- *socmed*: Is the desired data channel social media?
+- *tech*: Is the desired data channel technology?  
+- *world*: Is the desired data channel world?
+```{r}
+news_data <- channel("lifestyle")
+news_data
+```
+
+## Split data into train and test
+```{r}
+set.seed(216)
+intrain <- createDataPartition(news_data$Shares, p = 0.7, list = FALSE)
+training <- news_data[intrain,]
+testing <- news_data[-intrain,]
+```
+
+# Summarization
+
+# Modeling
+## Random forest model
+```{r}
+rf_model <- train(Shares ~ ., 
+                  data = training, 
+                  method = "rf", 
+                  preProcess = c("center", "scale"), 
+                  trControl = trainControl(method = "cv", number = 5), 
+                  tuneGrid = expand.grid(mtry = c(1:14)))
+```
+                         
+## Boosted tree model
+```{r, results="hide"}
+tunegrid <- expand.grid(interaction.depth = 1:4,
+                        n.trees = c(25, 50, 100, 150, 200),
+                        shrinkage = 0.1,
+                        n.minobsinnode = 10)
+
+gbm_model <- train(Shares ~.,
+                 data = training,
+                 method = "gbm",
+                 preProcess = c("center", "scale"),
+                 trControl = trainControl(method = "cv", number = 5),
+                 tuneGrid = tunegrid)
+```
+
+# Comparison
+## Apply model for prediction
+```{r}
+rf_predict <- predict(rf_model, newdata = testing)
+```
+
+```{r}
+gbm_predict <- predict(gbm_model, newdata = testing)
+```
+
+
+## Model performance
+```{r, eval=FALSE}
+confusionMatrix(data = testing$Shares, reference = rf_predict)
+```
+
+```{r, eval=FALSE}
+confusionMatrix(data = testing$Shares, reference = gbm_predict)
+```
+
+
+# Automation
