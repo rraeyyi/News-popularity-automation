@@ -14,6 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(readr)
 library(dplyr)
 library(caret)
+library(ggplot2)
 ```
 
 # Data
@@ -68,6 +69,11 @@ testing <- news_data[-intrain,]
 ```
 
 # Summarization
+```{r}
+# Title length & polarity vs shares
+ggplot(training, aes(x = Number_Title_Words, y=Shares)) + 
+  geom_point(aes(color = Title_Polarity))
+```
 
 # Modeling
 ## Random forest model
