@@ -1,11 +1,11 @@
 ---
-title: "Project3"
+title: "ST 558 Project 3"
 author: "Rachel Hencher and Yi Ren"
-date: "2022-11-01"
+date: "2022-11-02"
 output: github_document
 ---
 
-```{r setup, include=FALSE} 
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -31,16 +31,23 @@ channel <- function(x){
                  "Number_Content_Words" = "n_tokens_content",
                  "Number_Images" = "num_imgs",
                  "Number_Videos" = "num_videos",
-                 starts_with("weekday"),
+                 "Published_Mon" = ends_with("monday"),
+                 "Published_Tues" = ends_with("tuesday"),
+                 "Published_Weds" = ends_with("wednesday"),
+                 "Published_Thurs" = ends_with("thursday"),
+                 "Published_Fri" = ends_with("friday"),
+                 "Published_Sat" = ends_with("saturday"),
+                 "Published_Sun" = ends_with("sunday"),
                  "Positive_Word_Rate" = "global_rate_positive_words",
                  "Negative_Word_Rate" = "global_rate_negative_words",
                  "Title_Polarity" = "title_sentiment_polarity",
                  "Shares" = "shares")
-  return(news)
+
+return(news)
 }
 ```
 
-## Set up options for the `channel` function argument:  
+## Choose an option for the `channel` function argument:  
 - *lifestyle*: Is the desired data channel lifestyle?  
 - *entertainment*: Is the desired data channel entertainment?  
 - *bus*: Is the desired data channel business?  
@@ -48,49 +55,65 @@ channel <- function(x){
 - *tech*: Is the desired data channel technology?  
 - *world*: Is the desired data channel world?
 ```{r}
-lifestyle <- channel("lifestyle")
-entertainment <- channel("entertainment")
-bus <- channel("bus")
-socmed <- channel("socmed")
-tech <- channel("tech")
-world <- channel("world")
-
-news_data <- channel("world")
+news_data <- channel("lifestyle")
 news_data
 ```
 
 ## Split data into train and test
 ```{r}
 set.seed(216)
-intrain <- createDataPartition(data$Shares, p = 0.7, list = FALSE)
-lifestyletrain <- data[intrain,]
-lifestyletest <- data[-intrain,]
+intrain <- createDataPartition(news_data$Shares, p = 0.7, list = FALSE)
+training <- news_data[intrain,]
+testing <- news_data[-intrain,]
 ```
 
 # Summarization
 
 # Modeling
+## Random forest model
+```{r}
+rf_model <- train(Shares ~ ., 
+                  data = training, 
+                  method = "rf", 
+                  preProcess = c("center", "scale"), 
+                  trControl = trainControl(method = "cv", number = 5), 
+                  tuneGrid = expand.grid(mtry = c(1:14)))
+```
+                         
 ## Boosted tree model
-```{r, results='hide'}
+```{r, results="hide"}
 tunegrid <- expand.grid(interaction.depth = 1:4,
                         n.trees = c(25, 50, 100, 150, 200),
                         shrinkage = 0.1,
                         n.minobsinnode = 10)
 
-gbmTune <- train(Shares ~.,
-                 data = lifestyletrain,
+gbm_model <- train(Shares ~.,
+                 data = training,
                  method = "gbm",
-                 trControl = trainControl(method = "cv",
-                                          number = 5),
+                 preProcess = c("center", "scale"),
+                 trControl = trainControl(method = "cv", number = 5),
                  tuneGrid = tunegrid)
 ```
 
-
 # Comparison
 ## Apply model for prediction
-pred_gbm <- predict(gbmTune, newdata = lifestyletest)
+```{r}
+rf_predict <- predict(rf_model, newdata = testing)
+```
+
+```{r}
+gbm_predict <- predict(gbm_model, newdata = testing)
+```
+
 
 ## Model performance
-confusionMatrix(data = lifestyletest$shares, reference = pred_gbm)
+```{r, eval=FALSE}
+confusionMatrix(data = testing$Shares, reference = rf_predict)
+```
+
+```{r, eval=FALSE}
+confusionMatrix(data = testing$Shares, reference = gbm_predict)
+```
+
 
 # Automation
