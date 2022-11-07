@@ -41,6 +41,7 @@ news$Weekday <- as.factor(ifelse(news$weekday_is_monday == 1, "Mon",
                                                ifelse(news$weekday_is_thursday , "Thurs",
                                                       ifelse(news$weekday_is_friday == 1, "Fri",
                                                              ifelse(news$weekday_is_saturday == 1, "Sat", "Sun")))))))
+
 news_final <- news %>%
   select(-starts_with("weekday_is"))
 return(news_final)
@@ -129,7 +130,7 @@ ggplot(training, aes(x = Weekday, y = Shares)) +
 
 ``` r
 # Scatterplot of title length & polarity vs shares
-ggplot(training, aes(x = Number_Title_Words, y=Shares)) + 
+ggplot(training, aes(x = Number_Title_Words, y = Shares)) + 
   geom_point(aes(color = Title_Polarity))
 ```
 
@@ -143,12 +144,12 @@ ggplot(training, aes(x = Number_Title_Words, y=Shares)) +
 control <- trainControl(method = "cv", number = 5)
 ```
 
-## Linear regression model
+## Linear regression models
 
 ``` r
 lasso_model <- train(Shares ~ .,
                    data = training,
-                   method='lasso',
+                   method ='lasso',
                    preProcess = c("center", "scale"),
                    trControl = control)
 predict(lasso_model$finalModel, type = "coef")
@@ -219,6 +220,30 @@ lasso_model$bestTune
     ##   fraction
     ## 1      0.1
 
+``` r
+fwdstep_model <- train(Shares ~ .,
+                   data = training,
+                   method ='glmStepAIC',
+                   preProcess = c("center", "scale"),
+                   trControl = control,
+                   direction = "forward",
+                   trace = FALSE)
+fwdstep_model
+```
+
+    ## Generalized Linear Model with Stepwise Feature Selection 
+    ## 
+    ## 1472 samples
+    ##    8 predictor
+    ## 
+    ## Pre-processing: centered (13), scaled (13) 
+    ## Resampling: Cross-Validated (5 fold) 
+    ## Summary of sample sizes: 1177, 1177, 1178, 1178, 1178 
+    ## Resampling results:
+    ## 
+    ##   RMSE      Rsquared     MAE     
+    ##   8071.276  0.004286913  3351.775
+
 ## Random forest model
 
 ``` r
@@ -238,18 +263,18 @@ rf_model
     ## 
     ## Pre-processing: centered (13), scaled (13) 
     ## Resampling: Cross-Validated (5 fold) 
-    ## Summary of sample sizes: 1177, 1177, 1178, 1178, 1178 
+    ## Summary of sample sizes: 1177, 1177, 1179, 1177, 1178 
     ## Resampling results across tuning parameters:
     ## 
     ##   mtry  RMSE      Rsquared     MAE     
-    ##   1     7999.160  0.005893449  3286.747
-    ##   2     8053.788  0.011156958  3319.744
-    ##   3     8085.157  0.014993760  3355.691
-    ##   4     8160.616  0.014401635  3409.110
-    ##   5     8164.681  0.023130750  3424.830
-    ##   6     8226.928  0.022821295  3452.441
-    ##   7     8251.860  0.021623743  3471.611
-    ##   8     8296.033  0.022868981  3481.570
+    ##   1     7586.169  0.006679430  3300.900
+    ##   2     7712.214  0.008337636  3323.908
+    ##   3     7828.531  0.008338324  3373.902
+    ##   4     8030.110  0.007156748  3432.893
+    ##   5     8152.765  0.007106801  3460.842
+    ##   6     8262.927  0.006602226  3484.894
+    ##   7     8398.355  0.007539878  3501.446
+    ##   8     8441.366  0.006237354  3508.179
     ## 
     ## RMSE was used to select the optimal model using the smallest value.
     ## The final value used for the model was mtry = 1.
@@ -273,19 +298,19 @@ gbm_model
     ## 
     ## Pre-processing: centered (13), scaled (13) 
     ## Resampling: Cross-Validated (5 fold) 
-    ## Summary of sample sizes: 1178, 1177, 1178, 1177, 1178 
+    ## Summary of sample sizes: 1177, 1178, 1177, 1178, 1178 
     ## Resampling results across tuning parameters:
     ## 
     ##   interaction.depth  n.trees  RMSE      Rsquared     MAE     
-    ##   1                   50      8003.434  0.001461953  3375.261
-    ##   1                  100      8035.622  0.001419449  3392.443
-    ##   1                  150      8060.513  0.001722913  3413.707
-    ##   2                   50      8121.637  0.002128725  3420.408
-    ##   2                  100      8116.873  0.004255253  3415.410
-    ##   2                  150      8198.727  0.003282307  3499.301
-    ##   3                   50      8108.768  0.003004964  3441.230
-    ##   3                  100      8169.823  0.004089264  3487.787
-    ##   3                  150      8213.640  0.006163975  3563.256
+    ##   1                   50      8019.673  0.002085941  3400.290
+    ##   1                  100      8039.321  0.001504858  3425.814
+    ##   1                  150      8029.943  0.001910256  3403.265
+    ##   2                   50      8067.431  0.001081430  3415.035
+    ##   2                  100      8066.735  0.002712858  3413.244
+    ##   2                  150      8144.404  0.003573107  3473.736
+    ##   3                   50      8104.459  0.008447615  3481.266
+    ##   3                  100      8079.077  0.007754760  3451.902
+    ##   3                  150      8267.039  0.008276244  3626.735
     ## 
     ## Tuning parameter 'shrinkage' was held constant at a value of 0.1
     ## 
@@ -300,41 +325,32 @@ gbm_model
 
 ``` r
 lasso_predict <- predict(lasso_model, newdata = testing)
-```
 
-``` r
+fwdstep_predict <- predict(fwdstep_model, newdata = testing)
+
 rf_predict <- predict(rf_model, newdata = testing)
-```
 
-``` r
 gbm_predict <- predict(gbm_model, newdata = testing)
 ```
 
 ## Model performance
 
 ``` r
-postResample(lasso_predict, testing$Shares)
+Lasso <- postResample(lasso_predict, obs = testing$Shares)
+
+Forward_Stepwise <- postResample(fwdstep_predict, obs = testing$Shares)
+
+Random_Forest <- postResample(rf_predict, obs = testing$Shares)
+
+Boosted_Tree <- postResample(gbm_predict, obs = testing$Shares)
+
+rbind(Lasso, Forward_Stepwise, Random_Forest, Boosted_Tree)
 ```
 
-    ##         RMSE     Rsquared          MAE 
-    ## 9.650057e+03 5.337779e-03 3.285077e+03
-
-``` r
-postResample(rf_predict, testing$Shares)
-```
-
-    ##         RMSE     Rsquared          MAE 
-    ## 9.634652e+03 6.128408e-03 3.198692e+03
-
-``` r
-postResample(gbm_predict, testing$Shares)
-```
-
-    ##         RMSE     Rsquared          MAE 
-    ## 9.653431e+03 5.695084e-03 3.235539e+03
-
-``` r
-confusionMatrix(data = testing$Shares, reference = gbm_predict)
-```
+    ##                      RMSE    Rsquared      MAE
+    ## Lasso            9650.057 0.005337779 3285.077
+    ## Forward_Stepwise 9646.664 0.004534141 3246.652
+    ## Random_Forest    9637.121 0.005537998 3189.949
+    ## Boosted_Tree     9695.017 0.004761231 3284.014
 
 # Automation

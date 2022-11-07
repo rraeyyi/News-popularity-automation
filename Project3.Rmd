@@ -81,7 +81,7 @@ ggplot(training, aes(x = Weekday, y = Shares)) +
   geom_boxplot(color = "royal blue") +
   scale_y_continuous(trans="log10")
 # Scatterplot of title length & polarity vs shares
-ggplot(training, aes(x = Number_Title_Words, y=Shares)) + 
+ggplot(training, aes(x = Number_Title_Words, y = Shares)) + 
   geom_point(aes(color = Title_Polarity))
 ```
 
@@ -91,15 +91,26 @@ ggplot(training, aes(x = Number_Title_Words, y=Shares)) +
 control <- trainControl(method = "cv", number = 5)
 ```
 
-## Linear regression model
+## Linear regression models
 ```{r}
 lasso_model <- train(Shares ~ .,
                    data = training,
-                   method='lasso',
+                   method ='lasso',
                    preProcess = c("center", "scale"),
                    trControl = control)
 predict(lasso_model$finalModel, type = "coef")
 lasso_model$bestTune
+```
+
+```{r}
+fwdstep_model <- train(Shares ~ .,
+                   data = training,
+                   method ='glmStepAIC',
+                   preProcess = c("center", "scale"),
+                   trControl = control,
+                   direction = "forward",
+                   trace = FALSE)
+fwdstep_model
 ```
 
 ## Random forest model
@@ -128,31 +139,25 @@ gbm_model
 ## Apply model for prediction
 ```{r}
 lasso_predict <- predict(lasso_model, newdata = testing)
-```
 
-```{r}
+fwdstep_predict <- predict(fwdstep_model, newdata = testing)
+
 rf_predict <- predict(rf_model, newdata = testing)
-```
 
-```{r}
 gbm_predict <- predict(gbm_model, newdata = testing)
 ```
 
 ## Model performance
 ```{r}
-postResample(lasso_predict, testing$Shares)
-```
+Lasso <- postResample(lasso_predict, obs = testing$Shares)
 
-```{r}
-postResample(rf_predict, testing$Shares)
-```
+Forward_Stepwise <- postResample(fwdstep_predict, obs = testing$Shares)
 
-```{r}
-postResample(gbm_predict, testing$Shares)
-```
+Random_Forest <- postResample(rf_predict, obs = testing$Shares)
 
-```{r, eval=FALSE}
-confusionMatrix(data = testing$Shares, reference = gbm_predict)
+Boosted_Tree <- postResample(gbm_predict, obs = testing$Shares)
+
+rbind(Lasso, Forward_Stepwise, Random_Forest, Boosted_Tree)
 ```
 
 
