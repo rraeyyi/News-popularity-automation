@@ -38,19 +38,14 @@ channel <- function(x){
                  "Title_Polarity" = "title_sentiment_polarity",
                  "Shares" = "shares")
   
-news$Weekday <- NA
-news$Weekday [news$weekday_is_monday==1] <- "Mon"
-news$Weekday [news$weekday_is_tuesday==1] <- "Tues"
-news$Weekday [news$weekday_is_wednesday==1] <- "Wed"
-news$Weekday [news$weekday_is_thursday==1] <- "Thurs"
-news$Weekday [news$weekday_is_friday==1] <- "Fri"
-news$Weekday [news$weekday_is_saturday==1] <- "Sat"
-news$Weekday [news$weekday_is_sunday==1] <- "Sun"
-news$Weekday <- as.factor(news$Weekday)
-
+news$Weekday <- as.factor(ifelse(news$weekday_is_monday == 1, "Mon",
+                                 ifelse(news$weekday_is_tuesday == 1, "Tues", 
+                                        ifelse(news$weekday_is_wednesday == 1, "Weds", 
+                                               ifelse(news$weekday_is_thursday , "Thurs",
+                                                      ifelse(news$weekday_is_friday == 1, "Fri",
+                                                             ifelse(news$weekday_is_saturday == 1, "Sat", "Sun")))))))
 news_final <- news %>%
   select(-starts_with("weekday_is"))
-
 return(news_final)
 }
 ```
@@ -62,6 +57,7 @@ return(news_final)
 - *socmed*: Is the desired data channel social media?
 - *tech*: Is the desired data channel technology?  
 - *world*: Is the desired data channel world?
+
 ```{r}
 news_data <- channel("lifestyle")
 news_data
@@ -79,55 +75,77 @@ testing <- news_data[-intrain,]
 ```{r}
 # Summary stats for all variables
 summary(training)
-
 # Boxplot of weekday vs shares
 ggplot(training, aes(x = Weekday, y = Shares)) +
   geom_boxplot(color = "royal blue") +
   scale_y_continuous(trans="log10")
-
 # Scatterplot of title length & polarity vs shares
 ggplot(training, aes(x = Number_Title_Words, y=Shares)) + 
   geom_point(aes(color = Title_Polarity))
 ```
 
 # Modeling
+## Set up cross validation
+```{r}
+control <- trainControl(method = "cv", number = 3)
+```
+
+## Linear regression model
+```{r}
+lasso_model <- train(Shares ~ .,
+                   data = training,
+                   method='lasso',
+                   preProcess = c("center", "scale"),
+                   trControl = control)
+predict(lasso_model$finalModel, type = "coef")
+lasso_model$bestTune
+```
+
 ## Random forest model
 ```{r}
 rf_model <- train(Shares ~ ., 
                   data = training, 
                   method = "rf", 
                   preProcess = c("center", "scale"), 
-                  trControl = trainControl(method = "cv", number = 5), 
-                  tuneGrid = expand.grid(mtry = c(1:14)))
+                  trControl = control, 
+                  tuneGrid = expand.grid(mtry = ncol(training) - 1))
+rf_model
 ```
                          
 ## Boosted tree model
-```{r, results="hide"}
-tunegrid <- expand.grid(interaction.depth = 1:4,
-                        n.trees = c(25, 50, 100, 150, 200),
-                        shrinkage = 0.1,
-                        n.minobsinnode = 10)
-
-gbm_model <- train(Shares ~.,
-                 data = training,
-                 method = "gbm",
-                 preProcess = c("center", "scale"),
-                 trControl = trainControl(method = "cv", number = 5),
-                 tuneGrid = tunegrid)
+```{r}
+gbm_model <- train(Shares ~ .,
+                     data = training,
+                     method = "gbm",
+                     trControl = control,
+                     preProcess = c("center", "scale"),
+                     verbose = FALSE)
+gbm_model
 ```
 
 # Comparison
 ## Apply model for prediction
 ```{r}
+lasso_predict <- predict(lasso_model, newdata = testing)
+lasso_predict
+```
+
+```{r}
 rf_predict <- predict(rf_model, newdata = testing)
+rf_predict
 ```
 
 ```{r}
 gbm_predict <- predict(gbm_model, newdata = testing)
+gbm_predict
 ```
 
 
 ## Model performance
+```{r}
+postResample(lasso_predict, obs = testing$Shares)
+```
+
 ```{r, eval=FALSE}
 confusionMatrix(data = testing$Shares, reference = rf_predict)
 ```
