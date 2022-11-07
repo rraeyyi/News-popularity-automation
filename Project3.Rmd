@@ -38,15 +38,12 @@ channel <- function(x){
                  "Title_Polarity" = "title_sentiment_polarity",
                  "Shares" = "shares")
   
-news$Weekday <- NA
-news$Weekday [news$weekday_is_monday==1] <- "Mon"
-news$Weekday [news$weekday_is_tuesday==1] <- "Tues"
-news$Weekday [news$weekday_is_wednesday==1] <- "Wed"
-news$Weekday [news$weekday_is_thursday==1] <- "Thurs"
-news$Weekday [news$weekday_is_friday==1] <- "Fri"
-news$Weekday [news$weekday_is_saturday==1] <- "Sat"
-news$Weekday [news$weekday_is_sunday==1] <- "Sun"
-news$Weekday <- as.factor(news$Weekday)
+news$Weekday <- as.factor(ifelse(news$weekday_is_monday == 1, "monday",
+                                 ifelse(news$weekday_is_tuesday == 1, "tuesday", 
+                                        ifelse(news$weekday_is_wednesday == 1, "wednesday", 
+                                               ifelse(news$weekday_is_thursday , "thursday",
+                                                      ifelse(news$weekday_is_friday == 1, "friday",
+                                                             ifelse(news$weekday_is_saturday == 1, "saturday", "sunday")))))))
 
 news_final <- news %>%
   select(-starts_with("weekday_is"))
@@ -62,6 +59,7 @@ return(news_final)
 - *socmed*: Is the desired data channel social media?
 - *tech*: Is the desired data channel technology?  
 - *world*: Is the desired data channel world?
+
 ```{r}
 news_data <- channel("lifestyle")
 news_data
@@ -131,7 +129,7 @@ gbm_model
 # Comparison
 ## Apply model for prediction
 ```{r}
-lasso_predict <- predict(lasso, newdata = testing)
+lasso_predict <- predict(lasso_model, newdata = testing)
 ```
 
 ```{r}
