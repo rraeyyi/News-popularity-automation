@@ -47,7 +47,6 @@ news$Weekday <- as.factor(ifelse(news$weekday_is_monday == 1, "Mon",
 
 news_final <- news %>%
   select(-starts_with("weekday_is"))
-
 return(news_final)
 }
 ```
@@ -77,12 +76,10 @@ testing <- news_data[-intrain,]
 ```{r}
 # Summary stats for all variables
 summary(training)
-
 # Boxplot of weekday vs shares
 ggplot(training, aes(x = Weekday, y = Shares)) +
   geom_boxplot(color = "royal blue") +
   scale_y_continuous(trans="log10")
-
 # Scatterplot of title length & polarity vs shares
 ggplot(training, aes(x = Number_Title_Words, y=Shares)) + 
   geom_point(aes(color = Title_Polarity))
