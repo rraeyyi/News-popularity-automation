@@ -19,7 +19,7 @@ library(ggplot2)
 
 # Data
 ## Read in and subset data
-```{r}
+```{r, message=FALSE}
 OnlineNewsPopularity <- read_csv("OnlineNewsPopularity.csv") 
 OnlineNewsPopularity$url <- NULL
 channel <- function(x){
@@ -87,7 +87,7 @@ ggplot(training, aes(x = Number_Title_Words, y=Shares)) +
 # Modeling
 ## Set up cross validation
 ```{r}
-control <- trainControl(method = "cv", number = 3)
+control <- trainControl(method = "cv", number = 5)
 ```
 
 ## Linear regression model
@@ -108,7 +108,7 @@ rf_model <- train(Shares ~ .,
                   method = "rf", 
                   preProcess = c("center", "scale"), 
                   trControl = control, 
-                  tuneGrid = expand.grid(mtry = ncol(training) - 1))
+                  tuneGrid = expand.grid(mtry = 1:(ncol(training) - 1)))
 rf_model
 ```
                          
@@ -127,27 +127,27 @@ gbm_model
 ## Apply model for prediction
 ```{r}
 lasso_predict <- predict(lasso_model, newdata = testing)
-lasso_predict
 ```
 
 ```{r}
 rf_predict <- predict(rf_model, newdata = testing)
-rf_predict
 ```
 
 ```{r}
 gbm_predict <- predict(gbm_model, newdata = testing)
-gbm_predict
 ```
-
 
 ## Model performance
 ```{r}
-postResample(lasso_predict, obs = testing$Shares)
+postResample(lasso_predict, testing$Shares)
 ```
 
-```{r, eval=FALSE}
-confusionMatrix(data = testing$Shares, reference = rf_predict)
+```{r}
+postResample(rf_predict, testing$Shares)
+```
+
+```{r}
+postResample(gbm_predict, testing$Shares)
 ```
 
 ```{r, eval=FALSE}
