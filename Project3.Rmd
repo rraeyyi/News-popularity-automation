@@ -44,6 +44,7 @@ news$Weekday <- as.factor(ifelse(news$weekday_is_monday == 1, "Mon",
                                                ifelse(news$weekday_is_thursday , "Thurs",
                                                       ifelse(news$weekday_is_friday == 1, "Fri",
                                                              ifelse(news$weekday_is_saturday == 1, "Sat", "Sun")))))))
+
 news_final <- news %>%
   select(-starts_with("weekday_is"))
 return(news_final)
