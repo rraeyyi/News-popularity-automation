@@ -38,12 +38,12 @@ channel <- function(x){
                  "Title_Polarity" = "title_sentiment_polarity",
                  "Shares" = "shares")
   
-news$Weekday <- as.factor(ifelse(news$weekday_is_monday == 1, "monday",
-                                 ifelse(news$weekday_is_tuesday == 1, "tuesday", 
-                                        ifelse(news$weekday_is_wednesday == 1, "wednesday", 
-                                               ifelse(news$weekday_is_thursday , "thursday",
-                                                      ifelse(news$weekday_is_friday == 1, "friday",
-                                                             ifelse(news$weekday_is_saturday == 1, "saturday", "sunday")))))))
+news$Weekday <- as.factor(ifelse(news$weekday_is_monday == 1, "Mon",
+                                 ifelse(news$weekday_is_tuesday == 1, "Tues", 
+                                        ifelse(news$weekday_is_wednesday == 1, "Weds", 
+                                               ifelse(news$weekday_is_thursday , "Thurs",
+                                                      ifelse(news$weekday_is_friday == 1, "Fri",
+                                                             ifelse(news$weekday_is_saturday == 1, "Sat", "Sun")))))))
 
 news_final <- news %>%
   select(-starts_with("weekday_is"))
@@ -91,7 +91,7 @@ ggplot(training, aes(x = Number_Title_Words, y=Shares)) +
 # Modeling
 ## Set up cross validation
 ```{r}
-control<-trainControl(method="repeatedcv",number=3,repeats=5)
+control <- trainControl(method = "cv", number = 3)
 ```
 
 ## Linear regression model
@@ -101,8 +101,8 @@ lasso_model <- train(Shares ~ .,
                    method='lasso',
                    preProcess = c("center", "scale"),
                    trControl = control)
-predict(lasso$finalModel, type = "coef")
-lasso$bestTune
+predict(lasso_model$finalModel, type = "coef")
+lasso_model$bestTune
 ```
 
 ## Random forest model
@@ -111,14 +111,15 @@ rf_model <- train(Shares ~ .,
                   data = training, 
                   method = "rf", 
                   preProcess = c("center", "scale"), 
-                  trControl = trainControl(method = "cv", number = 5), 
-                  tuneGrid = expand.grid(mtry = c(1:14)))
+                  trControl = control, 
+                  tuneGrid = expand.grid(mtry = ncol(training) - 1))
+rf_model
 ```
                          
 ## Boosted tree model
-```{r, results="hide"}
-gbm_model <- train(shares ~ .,
-                     data = newstrain,
+```{r}
+gbm_model <- train(Shares ~ .,
+                     data = training,
                      method = "gbm",
                      trControl = control,
                      preProcess = c("center", "scale"),
@@ -130,14 +131,17 @@ gbm_model
 ## Apply model for prediction
 ```{r}
 lasso_predict <- predict(lasso_model, newdata = testing)
+lasso_predict
 ```
 
 ```{r}
 rf_predict <- predict(rf_model, newdata = testing)
+rf_predict
 ```
 
 ```{r}
 gbm_predict <- predict(gbm_model, newdata = testing)
+gbm_predict
 ```
 
 
