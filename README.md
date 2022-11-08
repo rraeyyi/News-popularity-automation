@@ -3,6 +3,14 @@
 # Purpose of project
 Our goal is to read in and analyze an online [news popularity data set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity) to create predictive models for the number of shares and automating Markdown reports based on each channel of interests.
 
+# R packages used
+```{r}
+library(readr)
+library(dplyr)
+library(caret)
+library(ggplot2)
+```
+
 # Automation for reports
 ```{r}
 channel <- c("Lifestyle", "Entertainment", "Bus", "Socmed", "Tech", "World")
