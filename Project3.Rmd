@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Load packages
-```{r, message=FALSE}
+```{r packages, message=FALSE}
 library(readr)
 library(dplyr)
 library(caret)
@@ -19,7 +19,7 @@ library(ggplot2)
 
 # Data
 ## Read in and subset data
-```{r, message=FALSE}
+```{r subset, message=FALSE}
 OnlineNewsPopularity <- read_csv("OnlineNewsPopularity.csv") 
 OnlineNewsPopularity$url <- NULL
 channel <- function(x){
@@ -59,13 +59,13 @@ return(news_final)
 - *tech*: Is the desired data channel technology?  
 - *world*: Is the desired data channel world?
 
-```{r}
+```{r channel}
 news_data <- channel("lifestyle")
 news_data
 ```
 
 ## Split data into train and test
-```{r}
+```{r split}
 set.seed(216)
 intrain <- createDataPartition(news_data$Shares, p = 0.7, list = FALSE)
 training <- news_data[intrain,]
@@ -73,7 +73,7 @@ testing <- news_data[-intrain,]
 ```
 
 # Summarization
-```{r}
+```{r summary}
 # Summary stats for all variables
 summary(training)
 # Boxplot of weekday vs shares
@@ -87,12 +87,12 @@ ggplot(training, aes(x = Number_Title_Words, y = Shares)) +
 
 # Modeling
 ## Set up cross validation
-```{r}
+```{r control}
 control <- trainControl(method = "cv", number = 5)
 ```
 
 ## Linear regression models
-```{r}
+```{r lasso}
 lasso_model <- train(Shares ~ .,
                    data = training,
                    method ='lasso',
@@ -102,7 +102,7 @@ predict(lasso_model$finalModel, type = "coef")
 lasso_model$bestTune
 ```
 
-```{r}
+```{r fwstep}
 fwdstep_model <- train(Shares ~ .,
                    data = training,
                    method ='glmStepAIC',
@@ -114,7 +114,7 @@ fwdstep_model
 ```
 
 ## Random forest model
-```{r}
+```{r rf}
 rf_model <- train(Shares ~ ., 
                   data = training, 
                   method = "rf", 
@@ -125,7 +125,7 @@ rf_model
 ```
                          
 ## Boosted tree model
-```{r}
+```{r gbm}
 gbm_model <- train(Shares ~ .,
                      data = training,
                      method = "gbm",
@@ -137,7 +137,7 @@ gbm_model
 
 # Comparison
 ## Apply model for prediction
-```{r}
+```{r prediction}
 lasso_predict <- predict(lasso_model, newdata = testing)
 
 fwdstep_predict <- predict(fwdstep_model, newdata = testing)
@@ -148,7 +148,7 @@ gbm_predict <- predict(gbm_model, newdata = testing)
 ```
 
 ## Model performance
-```{r}
+```{r performance}
 Lasso <- postResample(lasso_predict, obs = testing$Shares)
 
 Forward_Stepwise <- postResample(fwdstep_predict, obs = testing$Shares)
