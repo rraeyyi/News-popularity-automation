@@ -91,7 +91,7 @@ ggplot(training, aes(x = Number_Title_Words, y = Shares)) +
 control <- trainControl(method = "cv", number = 5)
 ```
 
-## Linear regression models
+## LASSO model
 ```{r lasso}
 lasso_model <- train(Shares ~ .,
                    data = training,
@@ -102,6 +102,7 @@ predict(lasso_model$finalModel, type = "coef")
 lasso_model$bestTune
 ```
 
+## Forward stepwise model
 ```{r fwstep}
 fwdstep_model <- train(Shares ~ .,
                    data = training,
