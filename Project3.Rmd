@@ -120,7 +120,7 @@ rf_model <- train(Shares ~ .,
                   method = "rf", 
                   preProcess = c("center", "scale"), 
                   trControl = control, 
-                  tuneGrid = expand.grid(mtry = 1:(ncol(training) - 1)))
+                  tuneGrid = expand.grid(mtry = (1:ncol(training))/3))
 rf_model
 ```
                          
@@ -139,22 +139,16 @@ gbm_model
 ## Apply model for prediction
 ```{r prediction}
 lasso_predict <- predict(lasso_model, newdata = testing)
-
 fwdstep_predict <- predict(fwdstep_model, newdata = testing)
-
 rf_predict <- predict(rf_model, newdata = testing)
-
 gbm_predict <- predict(gbm_model, newdata = testing)
 ```
 
 ## Model performance
 ```{r performance}
 Lasso <- postResample(lasso_predict, obs = testing$Shares)
-
 Forward_Stepwise <- postResample(fwdstep_predict, obs = testing$Shares)
-
 Random_Forest <- postResample(rf_predict, obs = testing$Shares)
-
 Boosted_Tree <- postResample(gbm_predict, obs = testing$Shares)
 
 rbind(Lasso, Forward_Stepwise, Random_Forest, Boosted_Tree)
