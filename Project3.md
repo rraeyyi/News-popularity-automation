@@ -1,7 +1,43 @@
-ST 558 Project 3
+Lifestyle Analysis
 ================
 Rachel Hencher and Yi Ren
 2022-11-02
+
+- <a href="#load-packages" id="toc-load-packages">Load packages</a>
+- <a href="#data" id="toc-data">Data</a>
+  - <a href="#read-in-and-subset-data" id="toc-read-in-and-subset-data">Read
+    in and subset data</a>
+  - <a href="#choose-an-option-for-the-channel-function-argument"
+    id="toc-choose-an-option-for-the-channel-function-argument">Choose an
+    option for the <code>channel</code> function argument:</a>
+  - <a href="#automation" id="toc-automation">Automation</a>
+  - <a href="#split-data-into-train-and-test"
+    id="toc-split-data-into-train-and-test">Split data into train and
+    test</a>
+- <a href="#summarization" id="toc-summarization">Summarization</a>
+  - <a href="#barplot-for-weekday" id="toc-barplot-for-weekday">Barplot for
+    weekday</a>
+- <a href="#boxplot-of-weekday-vs-shares"
+  id="toc-boxplot-of-weekday-vs-shares">Boxplot of weekday vs shares</a>
+- <a href="#scatterplot-of-title-length--polarity-vs-shares"
+  id="toc-scatterplot-of-title-length--polarity-vs-shares">Scatterplot of
+  title length &amp; polarity vs shares</a>
+  - <a href="#pairs-plot" id="toc-pairs-plot">Pairs plot</a>
+- <a href="#modeling" id="toc-modeling">Modeling</a>
+  - <a href="#set-up-cross-validation" id="toc-set-up-cross-validation">Set
+    up cross validation</a>
+  - <a href="#lasso-model" id="toc-lasso-model">LASSO model</a>
+  - <a href="#forward-stepwise-model"
+    id="toc-forward-stepwise-model">Forward stepwise model</a>
+  - <a href="#random-forest-model" id="toc-random-forest-model">Random
+    forest model</a>
+  - <a href="#boosted-tree-model" id="toc-boosted-tree-model">Boosted tree
+    model</a>
+- <a href="#comparison" id="toc-comparison">Comparison</a>
+  - <a href="#apply-model-for-prediction"
+    id="toc-apply-model-for-prediction">Apply model for prediction</a>
+  - <a href="#model-performance" id="toc-model-performance">Model
+    performance</a>
 
 # Load packages
 
@@ -19,33 +55,33 @@ library(ggplot2)
 ``` r
 OnlineNewsPopularity <- read_csv("OnlineNewsPopularity.csv") 
 OnlineNewsPopularity$url <- NULL
-channel <- function(x){
-  base <- "data_channel_is_"
-  data <- paste0(base,x) %>%  
-          noquote()
-  news <- OnlineNewsPopularity %>% 
-          filter(get(data) == 1) %>% 
-          select("Number_Title_Words" = "n_tokens_title",
-                 "Number_Content_Words" = "n_tokens_content",
-                 "Number_Images" = "num_imgs",
-                 "Number_Videos" = "num_videos",
-                 starts_with("weekday_is"),
-                 "Positive_Word_Rate" = "global_rate_positive_words",
-                 "Negative_Word_Rate" = "global_rate_negative_words",
-                 "Title_Polarity" = "title_sentiment_polarity",
-                 "Shares" = "shares")
-  
-news$Weekday <- as.factor(ifelse(news$weekday_is_monday == 1, "Mon",
-                                 ifelse(news$weekday_is_tuesday == 1, "Tues", 
-                                        ifelse(news$weekday_is_wednesday == 1, "Weds", 
-                                               ifelse(news$weekday_is_thursday , "Thurs",
-                                                      ifelse(news$weekday_is_friday == 1, "Fri",
-                                                             ifelse(news$weekday_is_saturday == 1, "Sat", "Sun")))))))
 
+news <- OnlineNewsPopularity %>% 
+  select("Number_Title_Words" = "n_tokens_title",
+         "Number_Content_Words" = "n_tokens_content",
+         "Number_Images" = "num_imgs",
+         "Number_Videos" = "num_videos",
+         starts_with("weekday_is"),
+         starts_with("data_channel_is"),
+         "Positive_Word_Rate" = "global_rate_positive_words",
+         "Negative_Word_Rate" = "global_rate_negative_words",
+         "Title_Polarity" = "title_sentiment_polarity",
+         "Shares" = "shares")
+  
+news$Weekday <- as.factor(ifelse(news$weekday_is_monday == 1, "Monday",
+                                 ifelse(news$weekday_is_tuesday == 1, "Tuesday", 
+                                        ifelse(news$weekday_is_wednesday == 1, "Wednesday", 
+                                               ifelse(news$weekday_is_thursday , "Thursday",
+                                                      ifelse(news$weekday_is_friday == 1, "Friday",
+                                                             ifelse(news$weekday_is_saturday == 1, "Saturday", "Sunday")))))))
+
+news$Channel <- as.factor(ifelse(news$data_channel_is_lifestyle == 1, "Lifestyle",
+                                 ifelse(news$data_channel_is_entertainment == 1, "Entertainment", 
+                                        ifelse(news$data_channel_is_bus == 1, "Bus", 
+                                               ifelse(news$data_channel_is_socmed , "Socmed",
+                                                      ifelse(news$data_channel_is_tech == 1, "Tech", "World"))))))
 news_final <- news %>%
-  select(-starts_with("weekday_is"))
-return(news_final)
-}
+  select(-c(starts_with("weekday_is"), starts_with("data_channel_is")))
 ```
 
 ## Choose an option for the `channel` function argument:
@@ -57,26 +93,12 @@ return(news_final)
 - *tech*: Is the desired data channel technology?  
 - *world*: Is the desired data channel world?
 
-``` r
-news_data <- channel("lifestyle")
-news_data
-```
+## Automation
 
-    ## # A tibble: 2,099 × 9
-    ##    Number_Title_Words Number_Content_Words Number_Images Number_Videos
-    ##                 <dbl>                <dbl>         <dbl>         <dbl>
-    ##  1                  8                  960            20             0
-    ##  2                 10                  187             1             0
-    ##  3                 11                  103             1             0
-    ##  4                 10                  243             0             0
-    ##  5                  8                  204             1             0
-    ##  6                 11                  315             1             0
-    ##  7                 10                 1190            20             0
-    ##  8                  6                  374             1             0
-    ##  9                 12                  499             1             0
-    ## 10                 11                  223             0             0
-    ## # … with 2,089 more rows, and 5 more variables: Positive_Word_Rate <dbl>,
-    ## #   Negative_Word_Rate <dbl>, Title_Polarity <dbl>, Shares <dbl>, Weekday <fct>
+``` r
+news_data <- news_final %>% 
+  filter(news_final$Channel == params$channel) %>% select(-Channel)
+```
 
 ## Split data into train and test
 
@@ -89,52 +111,59 @@ testing <- news_data[-intrain,]
 
 # Summarization
 
+## Barplot for weekday
+
 ``` r
-# Summary stats for all variables
-summary(training)
+ggplot(training, aes(x = Weekday)) +
+  geom_bar(position="dodge")
 ```
 
-    ##  Number_Title_Words Number_Content_Words Number_Images     Number_Videos   
-    ##  Min.   : 3.000     Min.   :   0.0       Min.   :  0.000   Min.   : 0.000  
-    ##  1st Qu.: 8.000     1st Qu.: 298.8       1st Qu.:  1.000   1st Qu.: 0.000  
-    ##  Median :10.000     Median : 498.0       Median :  1.000   Median : 0.000  
-    ##  Mean   : 9.765     Mean   : 622.4       Mean   :  4.669   Mean   : 0.483  
-    ##  3rd Qu.:11.000     3rd Qu.: 793.0       3rd Qu.:  8.000   3rd Qu.: 0.000  
-    ##  Max.   :18.000     Max.   :8474.0       Max.   :111.000   Max.   :50.000  
-    ##                                                                            
-    ##  Positive_Word_Rate Negative_Word_Rate Title_Polarity        Shares      
-    ##  Min.   :0.00000    Min.   :0.00000    Min.   :-1.0000   Min.   :    28  
-    ##  1st Qu.:0.03475    1st Qu.:0.01040    1st Qu.: 0.0000   1st Qu.:  1100  
-    ##  Median :0.04385    Median :0.01575    Median : 0.0000   Median :  1700  
-    ##  Mean   :0.04446    Mean   :0.01657    Mean   : 0.1080   Mean   :  3687  
-    ##  3rd Qu.:0.05333    3rd Qu.:0.02136    3rd Qu.: 0.2143   3rd Qu.:  3225  
-    ##  Max.   :0.12139    Max.   :0.06180    Max.   : 1.0000   Max.   :196700  
-    ##                                                                          
-    ##   Weekday   
-    ##  Fri  :214  
-    ##  Mon  :222  
-    ##  Sat  :122  
-    ##  Sun  :155  
-    ##  Thurs:247  
-    ##  Tues :223  
-    ##  Weds :289
+![](Project3_files/figure-gfm/barplot-1.png)<!-- --> \## Numeric
+summaries
 
 ``` r
+stat <- training %>% select(Number_Title_Words, Number_Content_Words, Number_Images, Number_Videos, Positive_Word_Rate, Negative_Word_Rate, Title_Polarity, Shares) %>% apply(2, function(x){summary(x[!is.na(x)])}) 
+knitr::kable(stat, caption = "Summary Stats for All Variables", digits = 2)
+```
+
+|         | Number_Title_Words | Number_Content_Words | Number_Images | Number_Videos | Positive_Word_Rate | Negative_Word_Rate | Title_Polarity |    Shares |
+|:--------|-------------------:|---------------------:|--------------:|--------------:|-------------------:|-------------------:|---------------:|----------:|
+| Min.    |               3.00 |                 0.00 |          0.00 |          0.00 |               0.00 |               0.00 |          -1.00 |     28.00 |
+| 1st Qu. |               8.00 |               298.75 |          1.00 |          0.00 |               0.03 |               0.01 |           0.00 |   1100.00 |
+| Median  |              10.00 |               498.00 |          1.00 |          0.00 |               0.04 |               0.02 |           0.00 |   1700.00 |
+| Mean    |               9.76 |               622.35 |          4.67 |          0.48 |               0.04 |               0.02 |           0.11 |   3687.17 |
+| 3rd Qu. |              11.00 |               793.00 |          8.00 |          0.00 |               0.05 |               0.02 |           0.21 |   3225.00 |
+| Max.    |              18.00 |              8474.00 |        111.00 |         50.00 |               0.12 |               0.06 |           1.00 | 196700.00 |
+
+Summary Stats for All Variables
+
 # Boxplot of weekday vs shares
+
+``` r
 ggplot(training, aes(x = Weekday, y = Shares)) +
   geom_boxplot(color = "royal blue") +
   scale_y_continuous(trans="log10")
 ```
 
-![](Project3_files/figure-gfm/summary-1.png)<!-- -->
+![](Project3_files/figure-gfm/boxplot-1.png)<!-- -->
+
+# Scatterplot of title length & polarity vs shares
 
 ``` r
-# Scatterplot of title length & polarity vs shares
 ggplot(training, aes(x = Number_Title_Words, y = Shares)) + 
   geom_point(aes(color = Title_Polarity))
 ```
 
-![](Project3_files/figure-gfm/summary-2.png)<!-- -->
+![](Project3_files/figure-gfm/scatterplot-1.png)<!-- -->
+
+## Pairs plot
+
+``` r
+training_sub <- training %>% select(Weekday)
+GGally::ggpairs(training_sub)
+```
+
+![](Project3_files/figure-gfm/ggpairs-1.png)<!-- -->
 
 # Modeling
 
@@ -182,36 +211,51 @@ predict(lasso_model$finalModel, type = "coef")
     ## 11          -92.05088             668.5817      0.000000      796.8285
     ## 12          -95.23637             674.4743     -6.645061      798.9564
     ## 13         -120.22250             715.3273    -58.164322      812.5976
-    ##    Positive_Word_Rate Negative_Word_Rate Title_Polarity WeekdayMon WeekdaySat
-    ## 0             0.00000            0.00000       0.000000     0.0000    0.00000
-    ## 1             0.00000            0.00000       0.000000     0.0000    0.00000
-    ## 2             0.00000            0.00000       0.000000     0.0000    0.00000
-    ## 3             0.00000            0.00000       0.000000   180.5782    0.00000
-    ## 4             0.00000           59.67134       0.000000   239.6589    0.00000
-    ## 5             0.00000           73.20568       0.000000   255.1374    0.00000
-    ## 6             0.00000           77.11953      -4.488534   260.2012    0.00000
-    ## 7             0.00000           96.07728     -28.125811   288.7892   28.99886
-    ## 8             0.00000          152.44431     -96.006716   372.6313  112.01359
-    ## 9            11.05990          163.42588    -111.665319   389.8758  129.09151
-    ## 10           11.64972          164.00271    -112.471441   391.1050  130.23795
-    ## 11           24.59157          174.97297    -130.067141   429.8247  164.35894
-    ## 12           27.10524          176.73272    -132.882278   437.1123  171.66419
-    ## 13           46.23105          190.11502    -151.339412   556.8847  276.41809
-    ##    WeekdaySun WeekdayThurs WeekdayTues WeekdayWeds
-    ## 0     0.00000     0.000000     0.00000      0.0000
-    ## 1     0.00000     0.000000     0.00000      0.0000
-    ## 2     0.00000     0.000000     0.00000      0.0000
-    ## 3     0.00000     0.000000     0.00000      0.0000
-    ## 4     0.00000     0.000000     0.00000      0.0000
-    ## 5    15.76728     0.000000     0.00000      0.0000
-    ## 6    21.25706     0.000000     0.00000      0.0000
-    ## 7    51.44346     0.000000     0.00000      0.0000
-    ## 8   137.34380     0.000000     0.00000      0.0000
-    ## 9   154.62991     0.000000     0.00000      0.0000
-    ## 10  155.81450     1.258177     0.00000      0.0000
-    ## 11  191.80560    41.174412    39.32642      0.0000
-    ## 12  199.54596    48.542938    46.63928      0.0000
-    ## 13  313.27092   171.675889   166.54379    131.9782
+    ##    Positive_Word_Rate Negative_Word_Rate Title_Polarity WeekdayMonday
+    ## 0             0.00000            0.00000       0.000000        0.0000
+    ## 1             0.00000            0.00000       0.000000        0.0000
+    ## 2             0.00000            0.00000       0.000000        0.0000
+    ## 3             0.00000            0.00000       0.000000      180.5782
+    ## 4             0.00000           59.67134       0.000000      239.6589
+    ## 5             0.00000           73.20568       0.000000      255.1374
+    ## 6             0.00000           77.11953      -4.488534      260.2012
+    ## 7             0.00000           96.07728     -28.125811      288.7892
+    ## 8             0.00000          152.44431     -96.006716      372.6313
+    ## 9            11.05990          163.42588    -111.665319      389.8758
+    ## 10           11.64972          164.00271    -112.471441      391.1050
+    ## 11           24.59157          174.97297    -130.067141      429.8247
+    ## 12           27.10524          176.73272    -132.882278      437.1123
+    ## 13           46.23105          190.11502    -151.339412      556.8847
+    ##    WeekdaySaturday WeekdaySunday WeekdayThursday WeekdayTuesday
+    ## 0          0.00000       0.00000        0.000000        0.00000
+    ## 1          0.00000       0.00000        0.000000        0.00000
+    ## 2          0.00000       0.00000        0.000000        0.00000
+    ## 3          0.00000       0.00000        0.000000        0.00000
+    ## 4          0.00000       0.00000        0.000000        0.00000
+    ## 5          0.00000      15.76728        0.000000        0.00000
+    ## 6          0.00000      21.25706        0.000000        0.00000
+    ## 7         28.99886      51.44346        0.000000        0.00000
+    ## 8        112.01359     137.34380        0.000000        0.00000
+    ## 9        129.09151     154.62991        0.000000        0.00000
+    ## 10       130.23795     155.81450        1.258177        0.00000
+    ## 11       164.35894     191.80560       41.174412       39.32642
+    ## 12       171.66419     199.54596       48.542938       46.63928
+    ## 13       276.41809     313.27092      171.675889      166.54379
+    ##    WeekdayWednesday
+    ## 0            0.0000
+    ## 1            0.0000
+    ## 2            0.0000
+    ## 3            0.0000
+    ## 4            0.0000
+    ## 5            0.0000
+    ## 6            0.0000
+    ## 7            0.0000
+    ## 8            0.0000
+    ## 9            0.0000
+    ## 10           0.0000
+    ## 11           0.0000
+    ## 12           0.0000
+    ## 13         131.9782
 
 ``` r
 lasso_model$bestTune
@@ -382,5 +426,3 @@ rbind(Lasso, Forward_Stepwise, Random_Forest, Boosted_Tree)
     ## Forward_Stepwise 9646.664 0.004534141 3246.652
     ## Random_Forest    9641.148 0.004767222 3195.742
     ## Boosted_Tree     9642.883 0.005141491 3174.342
-
-# Automation
