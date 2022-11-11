@@ -104,7 +104,7 @@ ggplot(training, aes(x = Number_Title_Words, y = Shares)) +
 
 ## Pairs plot
 ```{r ggpairs, message = FALSE}
-training_sub <- training %>% select(Weekday)
+training_sub <- training %>% select(-Weekday)
 GGally::ggpairs(training_sub)
 ```
 
@@ -144,7 +144,7 @@ rf_model <- train(Shares ~ .,
                   method = "rf", 
                   preProcess = c("center", "scale"), 
                   trControl = control, 
-                  tuneGrid = expand.grid(mtry = (1:ncol(training)) - 1))
+                  tuneGrid = expand.grid(mtry = 1:(ncol(training) - 1)))
 rf_model
 ```
                          
