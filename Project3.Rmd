@@ -1,16 +1,20 @@
 ---
-title: "ST 558 Project 3"
+title: "Lifestyle Analysis"
 author: "Rachel Hencher and Yi Ren"
 date: "2022-11-02"
-output: github_document
+output: 
+  rmarkdown::github_document:
+    toc: yes
+params:
+  channel: "Lifestyle"
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Load packages
-```{r packages, message=FALSE}
+```{r packages, message = FALSE}
 library(readr)
 library(dplyr)
 library(caret)
@@ -19,36 +23,35 @@ library(ggplot2)
 
 # Data
 ## Read in and subset data
-```{r subset, message=FALSE}
+```{r subset, message = FALSE}
 OnlineNewsPopularity <- read_csv("OnlineNewsPopularity.csv") 
 OnlineNewsPopularity$url <- NULL
-channel <- function(x){
-  base <- "data_channel_is_"
-  data <- paste0(base,x) %>%  
-          noquote()
-  news <- OnlineNewsPopularity %>% 
-          filter(get(data) == 1) %>% 
-          select("Number_Title_Words" = "n_tokens_title",
-                 "Number_Content_Words" = "n_tokens_content",
-                 "Number_Images" = "num_imgs",
-                 "Number_Videos" = "num_videos",
-                 starts_with("weekday_is"),
-                 "Positive_Word_Rate" = "global_rate_positive_words",
-                 "Negative_Word_Rate" = "global_rate_negative_words",
-                 "Title_Polarity" = "title_sentiment_polarity",
-                 "Shares" = "shares")
-  
-news$Weekday <- as.factor(ifelse(news$weekday_is_monday == 1, "Mon",
-                                 ifelse(news$weekday_is_tuesday == 1, "Tues", 
-                                        ifelse(news$weekday_is_wednesday == 1, "Weds", 
-                                               ifelse(news$weekday_is_thursday , "Thurs",
-                                                      ifelse(news$weekday_is_friday == 1, "Fri",
-                                                             ifelse(news$weekday_is_saturday == 1, "Sat", "Sun")))))))
 
+news <- OnlineNewsPopularity %>% 
+  select("Number_Title_Words" = "n_tokens_title",
+         "Number_Content_Words" = "n_tokens_content",
+         "Number_Images" = "num_imgs",
+         "Number_Videos" = "num_videos",
+         starts_with("weekday_is"),
+         "Positive_Word_Rate" = "global_rate_positive_words",
+         "Negative_Word_Rate" = "global_rate_negative_words",
+         "Title_Polarity" = "title_sentiment_polarity",
+         "Shares" = "shares")
+  
+news$Weekday <- as.factor(ifelse(news$weekday_is_monday == 1, "Monday",
+                                 ifelse(news$weekday_is_tuesday == 1, "Tuesday", 
+                                        ifelse(news$weekday_is_wednesday == 1, "Wednesday", 
+                                               ifelse(news$weekday_is_thursday , "Thursday",
+                                                      ifelse(news$weekday_is_friday == 1, "Friday",
+                                                             ifelse(news$weekday_is_saturday == 1, "Saturday", "Sunday")))))))
+
+news$Channel <- as.factor(ifelse(news$data_channel_is_lifestyle == 1, "Lifestyle",
+                                 ifelse(news$data_channel_is_entertainment == 1, "Entertainment", 
+                                        ifelse(news$data_channel_is_bus == 1, "Bus", 
+                                               ifelse(news$data_channel_is_socmed , "Socmed",
+                                                      ifelse(news$data_channel_is_tech == 1, "Tech", "World"))))))
 news_final <- news %>%
-  select(-starts_with("weekday_is"))
-return(news_final)
-}
+  select(-c(starts_with("weekday_is"), starts_with("data_channel_is")))
 ```
 
 ## Choose an option for the `channel` function argument:  
@@ -59,9 +62,10 @@ return(news_final)
 - *tech*: Is the desired data channel technology?  
 - *world*: Is the desired data channel world?
 
-```{r channel}
-news_data <- channel("lifestyle")
-news_data
+## Automation
+```{r automation}
+news_data <- news_final %>% 
+  filter(news_final$Channel == params$channel) %>% select(-Channel)
 ```
 
 ## Split data into train and test
@@ -73,16 +77,34 @@ testing <- news_data[-intrain,]
 ```
 
 # Summarization
+## Barplot for weekday
+```{r barplot}
+ggplot(training, aes(x = Weekday)) +
+  geom_bar(position="dodge")
+```
+## Numeric summaries
 ```{r summary}
-# Summary stats for all variables
-summary(training)
+stat <- training %>% select(Number_Title_Words, Number_Content_Words, Number_Images, Number_Videos, Positive_Word_Rate, Negative_Word_Rate, Title_Polarity, Shares) %>% apply(2, function(x){summary(x[!is.na(x)])}) 
+knitr::kable(stat, caption = "Summary Stats for All Variables", digits = 2)
+```
+
 # Boxplot of weekday vs shares
+```{r boxplot}
 ggplot(training, aes(x = Weekday, y = Shares)) +
   geom_boxplot(color = "royal blue") +
   scale_y_continuous(trans="log10")
+```
+
 # Scatterplot of title length & polarity vs shares
+```{r scatterplot}
 ggplot(training, aes(x = Number_Title_Words, y = Shares)) + 
   geom_point(aes(color = Title_Polarity))
+```
+
+## Pairs plot
+```{r ggpairs, message = FALSE}
+training_sub <- training %>% select(Weekday)
+GGally::ggpairs(training_sub)
 ```
 
 # Modeling
@@ -154,6 +176,3 @@ Boosted_Tree <- postResample(gbm_predict, obs = testing$Shares)
 
 rbind(Lasso, Forward_Stepwise, Random_Forest, Boosted_Tree)
 ```
-
-
-# Automation
