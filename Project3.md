@@ -126,7 +126,7 @@ ggplot(training, aes(x = Weekday, y = Shares)) +
   scale_y_continuous(trans="log10")
 ```
 
-![](Project3_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](Project3_files/figure-gfm/summary-1.png)<!-- -->
 
 ``` r
 # Scatterplot of title length & polarity vs shares
@@ -134,7 +134,7 @@ ggplot(training, aes(x = Number_Title_Words, y = Shares)) +
   geom_point(aes(color = Title_Polarity))
 ```
 
-![](Project3_files/figure-gfm/unnamed-chunk-5-2.png)<!-- -->
+![](Project3_files/figure-gfm/summary-2.png)<!-- -->
 
 # Modeling
 
@@ -144,7 +144,7 @@ ggplot(training, aes(x = Number_Title_Words, y = Shares)) +
 control <- trainControl(method = "cv", number = 5)
 ```
 
-## Linear regression models
+## LASSO model
 
 ``` r
 lasso_model <- train(Shares ~ .,
@@ -220,6 +220,8 @@ lasso_model$bestTune
     ##   fraction
     ## 1      0.1
 
+## Forward stepwise model
+
 ``` r
 fwdstep_model <- train(Shares ~ .,
                    data = training,
@@ -252,7 +254,40 @@ rf_model <- train(Shares ~ .,
                   method = "rf", 
                   preProcess = c("center", "scale"), 
                   trControl = control, 
-                  tuneGrid = expand.grid(mtry = 1:(ncol(training) - 1)))
+                  tuneGrid = expand.grid(mtry = (1:ncol(training))/3))
+```
+
+    ## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid mtry:
+    ## reset to within valid range
+
+    ## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid mtry:
+    ## reset to within valid range
+
+    ## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid mtry:
+    ## reset to within valid range
+
+    ## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid mtry:
+    ## reset to within valid range
+
+    ## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid mtry:
+    ## reset to within valid range
+
+    ## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid mtry:
+    ## reset to within valid range
+
+    ## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid mtry:
+    ## reset to within valid range
+
+    ## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid mtry:
+    ## reset to within valid range
+
+    ## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid mtry:
+    ## reset to within valid range
+
+    ## Warning in randomForest.default(x, y, mtry = param$mtry, ...): invalid mtry:
+    ## reset to within valid range
+
+``` r
 rf_model
 ```
 
@@ -266,15 +301,16 @@ rf_model
     ## Summary of sample sizes: 1177, 1177, 1179, 1177, 1178 
     ## Resampling results across tuning parameters:
     ## 
-    ##   mtry  RMSE      Rsquared     MAE     
-    ##   1     7586.169  0.006679430  3300.900
-    ##   2     7712.214  0.008337636  3323.908
-    ##   3     7828.531  0.008338324  3373.902
-    ##   4     8030.110  0.007156748  3432.893
-    ##   5     8152.765  0.007106801  3460.842
-    ##   6     8262.927  0.006602226  3484.894
-    ##   7     8398.355  0.007539878  3501.446
-    ##   8     8441.366  0.006237354  3508.179
+    ##   mtry       RMSE      Rsquared     MAE     
+    ##   0.3333333  7621.314  0.005447926  3307.638
+    ##   0.6666667  7625.198  0.002863195  3313.748
+    ##   1.0000000  7607.204  0.005780968  3301.258
+    ##   1.3333333  7609.420  0.004371294  3310.219
+    ##   1.6666667  7725.301  0.008201772  3334.233
+    ##   2.0000000  7780.980  0.006370242  3346.929
+    ##   2.3333333  7749.572  0.007681882  3336.056
+    ##   2.6666667  7853.790  0.007720811  3377.625
+    ##   3.0000000  7879.970  0.007117402  3392.686
     ## 
     ## RMSE was used to select the optimal model using the smallest value.
     ## The final value used for the model was mtry = 1.
@@ -298,19 +334,19 @@ gbm_model
     ## 
     ## Pre-processing: centered (13), scaled (13) 
     ## Resampling: Cross-Validated (5 fold) 
-    ## Summary of sample sizes: 1177, 1178, 1177, 1178, 1178 
+    ## Summary of sample sizes: 1178, 1177, 1178, 1178, 1177 
     ## Resampling results across tuning parameters:
     ## 
     ##   interaction.depth  n.trees  RMSE      Rsquared     MAE     
-    ##   1                   50      8019.673  0.002085941  3400.290
-    ##   1                  100      8039.321  0.001504858  3425.814
-    ##   1                  150      8029.943  0.001910256  3403.265
-    ##   2                   50      8067.431  0.001081430  3415.035
-    ##   2                  100      8066.735  0.002712858  3413.244
-    ##   2                  150      8144.404  0.003573107  3473.736
-    ##   3                   50      8104.459  0.008447615  3481.266
-    ##   3                  100      8079.077  0.007754760  3451.902
-    ##   3                  150      8267.039  0.008276244  3626.735
+    ##   1                   50      7330.701  0.002307151  3358.458
+    ##   1                  100      7398.831  0.001987359  3381.240
+    ##   1                  150      7466.179  0.003565683  3420.829
+    ##   2                   50      7373.533  0.005774166  3385.976
+    ##   2                  100      7473.697  0.006723050  3441.847
+    ##   2                  150      7553.264  0.004314856  3485.081
+    ##   3                   50      7409.319  0.006832997  3377.195
+    ##   3                  100      7611.208  0.004469131  3521.175
+    ##   3                  150      7677.556  0.004936298  3569.095
     ## 
     ## Tuning parameter 'shrinkage' was held constant at a value of 0.1
     ## 
@@ -325,11 +361,8 @@ gbm_model
 
 ``` r
 lasso_predict <- predict(lasso_model, newdata = testing)
-
 fwdstep_predict <- predict(fwdstep_model, newdata = testing)
-
 rf_predict <- predict(rf_model, newdata = testing)
-
 gbm_predict <- predict(gbm_model, newdata = testing)
 ```
 
@@ -337,11 +370,8 @@ gbm_predict <- predict(gbm_model, newdata = testing)
 
 ``` r
 Lasso <- postResample(lasso_predict, obs = testing$Shares)
-
 Forward_Stepwise <- postResample(fwdstep_predict, obs = testing$Shares)
-
 Random_Forest <- postResample(rf_predict, obs = testing$Shares)
-
 Boosted_Tree <- postResample(gbm_predict, obs = testing$Shares)
 
 rbind(Lasso, Forward_Stepwise, Random_Forest, Boosted_Tree)
@@ -350,7 +380,7 @@ rbind(Lasso, Forward_Stepwise, Random_Forest, Boosted_Tree)
     ##                      RMSE    Rsquared      MAE
     ## Lasso            9650.057 0.005337779 3285.077
     ## Forward_Stepwise 9646.664 0.004534141 3246.652
-    ## Random_Forest    9637.121 0.005537998 3189.949
-    ## Boosted_Tree     9695.017 0.004761231 3284.014
+    ## Random_Forest    9641.148 0.004767222 3195.742
+    ## Boosted_Tree     9642.883 0.005141491 3174.342
 
 # Automation
