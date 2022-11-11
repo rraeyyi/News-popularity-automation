@@ -33,6 +33,7 @@ news <- OnlineNewsPopularity %>%
          "Number_Images" = "num_imgs",
          "Number_Videos" = "num_videos",
          starts_with("weekday_is"),
+         starts_with("data_channel_is"),
          "Positive_Word_Rate" = "global_rate_positive_words",
          "Negative_Word_Rate" = "global_rate_negative_words",
          "Title_Polarity" = "title_sentiment_polarity",
