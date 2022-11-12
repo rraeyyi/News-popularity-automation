@@ -18,15 +18,12 @@ This report analyzes data on almost 40,000 articles published by Mashable throug
 
 ```{r, echo=FALSE, results='asis'}
 Name <- c("Channel", "Number_Title_Words", "Number_Content_Words", "Number_Images", "Number_Videos", "Positive_Word_Rate", "Negative_Word_Rate", "Title_Polarity", "Weekday", "Shares")
-Definition <- c("a", "b", "c", "d", "e", "f", "g", "h", "i", "j")
+Definition <- c("Data channel is Lifestyle, Entertainment, Business, Social Media, Tech, or World", "Number of words in the title", "Number of words in the content", "Number of images", "Number of videos", "Rate of positive words in the content", "Rate of negative words in the content", "Title polarity", "Weekday published", "Number of shares")
 vars <- cbind(Name, Definition)
 knitr::kable(vars)
 ```
 
-The purpose of this report is to look for patterns and to make predictions regarding the number of shares of articles.
-
-
-You should also mention the purpose of your analysis and the methods you’ll use to model the response. You’ll describe those in more detail later.
+The purpose of this report is to look for patterns and to make predictions regarding the number of shares for articles in one of six different channels. Following some exploratory data analysis, four different models are used to model the response: a LASSO regression model, a forward stepwise regression model, a random forest model, and a boosted tree model.
 
 # Load packages
 ```{r packages, message = FALSE}
@@ -72,10 +69,6 @@ news_final <- news %>%
   select(-c(starts_with("weekday_is"), starts_with("data_channel_is")))
 ```
 
-```{r}
-news_final
-```
-
 ## Automation
 ```{r automation}
 news_data <- news_final %>% 
@@ -98,6 +91,7 @@ testing <- news_data[-intrain,]
 ggplot(training, aes(x = Weekday)) +
   geom_bar(position="dodge")
 ```
+
 ## Numeric summaries
 ```{r summary}
 stat <- training %>% 

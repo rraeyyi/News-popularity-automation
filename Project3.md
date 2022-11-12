@@ -49,27 +49,25 @@ Mashable throughout the years 2013 and 2014. Although the original data
 set includes information on 61 different features about the articles,
 this report focuses on the following 9 variables:
 
-| Name                 | Definition |
-|:---------------------|:-----------|
-| Channel              | a          |
-| Number_Title_Words   | b          |
-| Number_Content_Words | c          |
-| Number_Images        | d          |
-| Number_Videos        | e          |
-| Positive_Word_Rate   | f          |
-| Negative_Word_Rate   | g          |
-| Title_Polarity       | h          |
-| Weekday              | i          |
-| Shares               | j          |
-
-Variable Descriptions
+| Name                 | Definition                                                                       |
+|:---------------------|:---------------------------------------------------------------------------------|
+| Channel              | Data channel is Lifestyle, Entertainment, Business, Social Media, Tech, or World |
+| Number_Title_Words   | Number of words in the title                                                     |
+| Number_Content_Words | Number of words in the content                                                   |
+| Number_Images        | Number of images                                                                 |
+| Number_Videos        | Number of videos                                                                 |
+| Positive_Word_Rate   | Rate of positive words in the content                                            |
+| Negative_Word_Rate   | Rate of negative words in the content                                            |
+| Title_Polarity       | Title polarity                                                                   |
+| Weekday              | Weekday published                                                                |
+| Shares               | Number of shares                                                                 |
 
 The purpose of this report is to look for patterns and to make
-predictions regarding the number of shares of articles.
-
-You should also mention the purpose of your analysis and the methods
-you’ll use to model the response. You’ll describe those in more detail
-later.
+predictions regarding the number of shares for articles in one of six
+different channels. Following some exploratory data analysis, four
+different models are used to model the response: a forward stepwise
+regression model, a LASSO regression model, a random forest model, and a
+boosted tree model.
 
 # Load packages
 
@@ -117,27 +115,6 @@ news$Channel <- as.factor(ifelse(news$data_channel_is_lifestyle == 1, "Lifestyle
 news_final <- news %>%
   select(-c(starts_with("weekday_is"), starts_with("data_channel_is")))
 ```
-
-``` r
-news_final
-```
-
-    ## # A tibble: 39,644 × 10
-    ##    Number_Title_Words Number_Content_Words Number_Images Number_Videos
-    ##                 <dbl>                <dbl>         <dbl>         <dbl>
-    ##  1                 12                  219             1             0
-    ##  2                  9                  255             1             0
-    ##  3                  9                  211             1             0
-    ##  4                  9                  531             1             0
-    ##  5                 13                 1072            20             0
-    ##  6                 10                  370             0             0
-    ##  7                  8                  960            20             0
-    ##  8                 12                  989            20             0
-    ##  9                 11                   97             0             0
-    ## 10                 10                  231             1             1
-    ## # … with 39,634 more rows, and 6 more variables: Positive_Word_Rate <dbl>,
-    ## #   Negative_Word_Rate <dbl>, Title_Polarity <dbl>, Shares <dbl>,
-    ## #   Weekday <fct>, Channel <fct>
 
 ## Automation
 
