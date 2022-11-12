@@ -9,22 +9,16 @@ library(readr)
 library(dplyr)
 library(caret)
 library(ggplot2)
+library(rmarkdown)
 ```
 
 # Automation for reports
 ```{r}
 channel <- c("Lifestyle", "Entertainment", "Bus", "Socmed", "Tech", "World")
-report <- paste0(channel, ".md")
-params <- lapply(channel, FUN = function(x){
-  return(list(channel = x))
-})
-reports <- tibble(channel, report, params)
-reports
-
-library(rmarkdown)
-apply(reports, MARGIN = 1, FUN=function(x){
-  render(input = "Channel_Analysis.Rmd", output_file = x[[2]], params = x[[3]])
-})
+for (i in 1:length(channel)){
+  render("Channel_Analysis.Rmd", 
+         params = list(channel = i), 
+         output_file = paste0(channel, ".md"))
 ```
 # Links to each reports
 + The analysis for [Lifestyle](LifestyleAnalysis.html).
