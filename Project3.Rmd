@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Introduction  
-This report analyzes data on almost 40,000 articles published by Mashable throughout the years 2013 and 2014. Although the original data set includes information on 61 different features about the articles, this report focuses on the following 9 variables:  
+This report analyzes data on almost 40,000 articles published by Mashable throughout the years 2013 and 2014. Although the original data set includes information on 61 different features about the articles, this report excludes and condenses some of those and focuses on the following 9 variables:  
 
 ```{r, echo=FALSE, results='asis'}
 Name <- c("Channel", "Number_Title_Words", "Number_Content_Words", "Number_Images", "Number_Videos", "Positive_Word_Rate", "Negative_Word_Rate", "Title_Polarity", "Weekday", "Shares")
@@ -33,6 +33,7 @@ library(knitr)
 library(caret)
 library(ggplot2)
 library(GGally)
+library(ggpubr)
 ```
 
 # Data
@@ -85,14 +86,9 @@ training <- news_data[intrain,]
 testing <- news_data[-intrain,]
 ```
 
-# Summarization
-## Barplot for weekday
-```{r barplot}
-ggplot(training, aes(x = Weekday)) +
-  geom_bar(position="dodge")
-```
-
-## Numeric summaries
+# Summarization  
+## Numeric summaries  
+The following table displays five-number summaries for each of the numeric variables explored.
 ```{r summary}
 stat <- training %>% 
   select(Number_Title_Words,
@@ -105,13 +101,31 @@ stat <- training %>%
          Shares) %>% 
   apply(2, function(x){summary(x[!is.na(x)])}) 
 
-kable(stat, caption = "Summary Stats for All Variables", digits = 2)
+kable(stat, caption = "Summary Stats for Numeric Variables", digits = 2)
+```
+
+## Pairs plot  
+The following graphic displays the correlation between each of the variables explored. There are several things to look out for... The correlation between `Shares`, our response, and each of the other variables, our predictors. A higher value close to -1 or 1 indicates the two variables are highly correlated. A value close to 0 indicates little to no correlation. Additionally, one should consider correlation between two predictor variables as well. A high correlation between two predictor variables is an indication of collinearity, which should be taken into account when creating models later.
+```{r ggpairs, message = FALSE}
+training_sub <- training %>% 
+  select(-Weekday)
+
+ggpairs(training_sub)
+```
+
+## Barplot for weekday  
+The following barplot displays counts for how many articles in a particular channel were published each day of the week over the time frame covered by the data set.
+```{r barplot}
+ggplot(training, aes(x = Weekday)) +
+  geom_bar(fill = "medium blue", position = "dodge") +
+  labs(y = "Count")
 ```
 
 ## Boxplot of weekday vs shares
 ```{r boxplot}
 ggplot(training, aes(x = Weekday, y = Shares)) +
   geom_boxplot(color = "royal blue") +
+  coord_flip() +
   scale_y_continuous(trans = "log10")
 ```
 
@@ -121,12 +135,17 @@ ggplot(training, aes(x = Number_Title_Words, y = Shares)) +
   geom_point(aes(color = Title_Polarity))
 ```
 
-## Pairs plot
-```{r ggpairs, message = FALSE}
-training_sub <- training %>% 
-  select(-Weekday)
+## Scatterplots of negative & positive word rate vs shares
+```{r scatterplot2}
+ggplot(training, aes(x = Positive_Word_Rate, y = Shares)) + 
+  geom_point(size = 0.7, color = "royal blue") + 
+  stat_cor(method = "pearson", label.x = 0, label.y = 100000, color = "royal blue") +
+  xlim(0, 0.125) + ylim(0, 250000)
 
-ggpairs(training_sub)
+ggplot(training, aes(x = Negative_Word_Rate, y = Shares)) + 
+  geom_point(size = 0.7, color = "dark blue") + 
+  stat_cor(method = "pearson", label.x = 0, label.y = 100000, color = "dark blue") +
+  xlim(0, 0.125) + ylim(0, 250000)
 ```
 
 # Modeling

@@ -13,6 +13,9 @@ Rachel Hencher and Yi Ren
     id="toc-split-data-into-train-and-test">Split data into train and
     test</a>
 - <a href="#summarization" id="toc-summarization">Summarization</a>
+  - <a href="#numeric-summaries" id="toc-numeric-summaries">Numeric
+    summaries</a>
+  - <a href="#pairs-plot" id="toc-pairs-plot">Pairs plot</a>
   - <a href="#barplot-for-weekday" id="toc-barplot-for-weekday">Barplot for
     weekday</a>
   - <a href="#boxplot-of-weekday-vs-shares"
@@ -20,7 +23,9 @@ Rachel Hencher and Yi Ren
   - <a href="#scatterplot-of-title-length--polarity-vs-shares"
     id="toc-scatterplot-of-title-length--polarity-vs-shares">Scatterplot of
     title length &amp; polarity vs shares</a>
-  - <a href="#pairs-plot" id="toc-pairs-plot">Pairs plot</a>
+  - <a href="#scatterplots-of-negative--positive-word-rate-vs-shares"
+    id="toc-scatterplots-of-negative--positive-word-rate-vs-shares">Scatterplots
+    of negative &amp; positive word rate vs shares</a>
 - <a href="#modeling" id="toc-modeling">Modeling</a>
   - <a href="#set-up-cross-validation" id="toc-set-up-cross-validation">Set
     up cross validation</a>
@@ -47,7 +52,8 @@ Rachel Hencher and Yi Ren
 This report analyzes data on almost 40,000 articles published by
 Mashable throughout the years 2013 and 2014. Although the original data
 set includes information on 61 different features about the articles,
-this report focuses on the following 9 variables:
+this report excludes and condenses some of those and focuses on the
+following 9 variables:
 
 | Name                 | Definition                                                                       |
 |:---------------------|:---------------------------------------------------------------------------------|
@@ -65,8 +71,8 @@ this report focuses on the following 9 variables:
 The purpose of this report is to look for patterns and to make
 predictions regarding the number of shares for articles in one of six
 different channels. Following some exploratory data analysis, four
-different models are used to model the response: a forward stepwise
-regression model, a LASSO regression model, a random forest model, and a
+different models are used to model the response: a LASSO regression
+model, a forward stepwise regression model, a random forest model, and a
 boosted tree model.
 
 # Load packages
@@ -78,6 +84,7 @@ library(knitr)
 library(caret)
 library(ggplot2)
 library(GGally)
+library(ggpubr)
 ```
 
 # Data
@@ -136,15 +143,10 @@ testing <- news_data[-intrain,]
 
 # Summarization
 
-## Barplot for weekday
+## Numeric summaries
 
-``` r
-ggplot(training, aes(x = Weekday)) +
-  geom_bar(position="dodge")
-```
-
-![](Project3_files/figure-gfm/barplot-1.png)<!-- --> \## Numeric
-summaries
+The following table displays five-number summaries for each of the
+numeric variables explored.
 
 ``` r
 stat <- training %>% 
@@ -172,11 +174,47 @@ kable(stat, caption = "Summary Stats for All Variables", digits = 2)
 
 Summary Stats for All Variables
 
+## Pairs plot
+
+The following graphic displays the correlation between each of the
+variables explored. There are several things to look out for… The
+correlation between `Shares`, our response, and each of the other
+variables, our predictors. A higher value close to -1 or 1 indicates the
+two variables are highly correlated. A value close to 0 indicates little
+to no correlation. Additionally, one should consider correlation between
+two predictor variables as well. A high correlation between two
+predictor variables is an indication of collinearity, which should be
+taken into account when creating models later.
+
+``` r
+training_sub <- training %>% 
+  select(-Weekday)
+
+ggpairs(training_sub)
+```
+
+![](Project3_files/figure-gfm/ggpairs-1.png)<!-- -->
+
+## Barplot for weekday
+
+The following barplot displays counts for how many articles in a
+particular channel were published each day of the week over the time
+frame covered by the data set.
+
+``` r
+ggplot(training, aes(x = Weekday)) +
+  geom_bar(fill = "medium blue", position = "dodge") +
+  labs(y = "Count")
+```
+
+![](Project3_files/figure-gfm/barplot-1.png)<!-- -->
+
 ## Boxplot of weekday vs shares
 
 ``` r
 ggplot(training, aes(x = Weekday, y = Shares)) +
   geom_boxplot(color = "royal blue") +
+  coord_flip() +
   scale_y_continuous(trans = "log10")
 ```
 
@@ -191,16 +229,25 @@ ggplot(training, aes(x = Number_Title_Words, y = Shares)) +
 
 ![](Project3_files/figure-gfm/scatterplot-1.png)<!-- -->
 
-## Pairs plot
+## Scatterplots of negative & positive word rate vs shares
 
 ``` r
-training_sub <- training %>% 
-  select(-Weekday)
-
-ggpairs(training_sub)
+ggplot(training, aes(x = Positive_Word_Rate, y = Shares)) + 
+  geom_point(size = 0.7, color = "royal blue") + 
+  stat_cor(method = "pearson", label.x = 0, label.y = 100000, color = "royal blue") +
+  xlim(0, 0.125) + ylim(0, 250000)
 ```
 
-![](Project3_files/figure-gfm/ggpairs-1.png)<!-- -->
+![](Project3_files/figure-gfm/scatterplot2-1.png)<!-- -->
+
+``` r
+ggplot(training, aes(x = Negative_Word_Rate, y = Shares)) + 
+  geom_point(size = 0.7, color = "dark blue") + 
+  stat_cor(method = "pearson", label.x = 0, label.y = 100000, color = "dark blue") +
+  xlim(0, 0.125) + ylim(0, 250000)
+```
+
+![](Project3_files/figure-gfm/scatterplot2-2.png)<!-- -->
 
 # Modeling
 
