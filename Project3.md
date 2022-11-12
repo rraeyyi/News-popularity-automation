@@ -7,9 +7,6 @@ Rachel Hencher and Yi Ren
 - <a href="#data" id="toc-data">Data</a>
   - <a href="#read-in-and-subset-data" id="toc-read-in-and-subset-data">Read
     in and subset data</a>
-  - <a href="#choose-an-option-for-the-channel-function-argument"
-    id="toc-choose-an-option-for-the-channel-function-argument">Choose an
-    option for the <code>channel</code> function argument:</a>
   - <a href="#automation" id="toc-automation">Automation</a>
   - <a href="#split-data-into-train-and-test"
     id="toc-split-data-into-train-and-test">Split data into train and
@@ -17,11 +14,11 @@ Rachel Hencher and Yi Ren
 - <a href="#summarization" id="toc-summarization">Summarization</a>
   - <a href="#barplot-for-weekday" id="toc-barplot-for-weekday">Barplot for
     weekday</a>
-- <a href="#boxplot-of-weekday-vs-shares"
-  id="toc-boxplot-of-weekday-vs-shares">Boxplot of weekday vs shares</a>
-- <a href="#scatterplot-of-title-length--polarity-vs-shares"
-  id="toc-scatterplot-of-title-length--polarity-vs-shares">Scatterplot of
-  title length &amp; polarity vs shares</a>
+  - <a href="#boxplot-of-weekday-vs-shares"
+    id="toc-boxplot-of-weekday-vs-shares">Boxplot of weekday vs shares</a>
+  - <a href="#scatterplot-of-title-length--polarity-vs-shares"
+    id="toc-scatterplot-of-title-length--polarity-vs-shares">Scatterplot of
+    title length &amp; polarity vs shares</a>
   - <a href="#pairs-plot" id="toc-pairs-plot">Pairs plot</a>
 - <a href="#modeling" id="toc-modeling">Modeling</a>
   - <a href="#set-up-cross-validation" id="toc-set-up-cross-validation">Set
@@ -49,8 +46,10 @@ Rachel Hencher and Yi Ren
 ``` r
 library(readr)
 library(dplyr)
+library(knitr)
 library(caret)
 library(ggplot2)
+library(GGally)
 ```
 
 # Data
@@ -89,20 +88,12 @@ news_final <- news %>%
   select(-c(starts_with("weekday_is"), starts_with("data_channel_is")))
 ```
 
-## Choose an option for the `channel` function argument:
-
-- *lifestyle*: Is the desired data channel lifestyle?  
-- *entertainment*: Is the desired data channel entertainment?  
-- *bus*: Is the desired data channel business?  
-- *socmed*: Is the desired data channel social media?
-- *tech*: Is the desired data channel technology?  
-- *world*: Is the desired data channel world?
-
 ## Automation
 
 ``` r
 news_data <- news_final %>% 
-  filter(news_final$Channel == params$channel) %>% select(-Channel)
+  filter(news_final$Channel == params$channel) %>% 
+  select(-Channel)
 ```
 
 ## Split data into train and test
@@ -110,6 +101,7 @@ news_data <- news_final %>%
 ``` r
 set.seed(216)
 intrain <- createDataPartition(news_data$Shares, p = 0.7, list = FALSE)
+
 training <- news_data[intrain,]
 testing <- news_data[-intrain,]
 ```
@@ -127,8 +119,18 @@ ggplot(training, aes(x = Weekday)) +
 summaries
 
 ``` r
-stat <- training %>% select(Number_Title_Words, Number_Content_Words, Number_Images, Number_Videos, Positive_Word_Rate, Negative_Word_Rate, Title_Polarity, Shares) %>% apply(2, function(x){summary(x[!is.na(x)])}) 
-knitr::kable(stat, caption = "Summary Stats for All Variables", digits = 2)
+stat <- training %>% 
+  select(Number_Title_Words,
+         Number_Content_Words,
+         Number_Images,
+         Number_Videos,
+         Positive_Word_Rate,
+         Negative_Word_Rate,
+         Title_Polarity,
+         Shares) %>% 
+  apply(2, function(x){summary(x[!is.na(x)])}) 
+
+kable(stat, caption = "Summary Stats for All Variables", digits = 2)
 ```
 
 |         | Number_Title_Words | Number_Content_Words | Number_Images | Number_Videos | Positive_Word_Rate | Negative_Word_Rate | Title_Polarity |    Shares |
@@ -142,17 +144,17 @@ knitr::kable(stat, caption = "Summary Stats for All Variables", digits = 2)
 
 Summary Stats for All Variables
 
-# Boxplot of weekday vs shares
+## Boxplot of weekday vs shares
 
 ``` r
 ggplot(training, aes(x = Weekday, y = Shares)) +
   geom_boxplot(color = "royal blue") +
-  scale_y_continuous(trans="log10")
+  scale_y_continuous(trans = "log10")
 ```
 
 ![](Project3_files/figure-gfm/boxplot-1.png)<!-- -->
 
-# Scatterplot of title length & polarity vs shares
+## Scatterplot of title length & polarity vs shares
 
 ``` r
 ggplot(training, aes(x = Number_Title_Words, y = Shares)) + 
@@ -164,8 +166,10 @@ ggplot(training, aes(x = Number_Title_Words, y = Shares)) +
 ## Pairs plot
 
 ``` r
-training_sub <- training %>% select(-Weekday)
-GGally::ggpairs(training_sub)
+training_sub <- training %>% 
+  select(-Weekday)
+
+ggpairs(training_sub)
 ```
 
 ![](Project3_files/figure-gfm/ggpairs-1.png)<!-- -->
@@ -182,10 +186,10 @@ control <- trainControl(method = "cv", number = 5)
 
 ``` r
 lasso_model <- train(Shares ~ .,
-                   data = training,
-                   method ='lasso',
-                   preProcess = c("center", "scale"),
-                   trControl = control)
+                     data = training,
+                     method ='lasso',
+                     preProcess = c("center", "scale"),
+                     trControl = control)
 predict(lasso_model$finalModel, type = "coef")
 ```
 
@@ -273,12 +277,12 @@ lasso_model$bestTune
 
 ``` r
 fwdstep_model <- train(Shares ~ .,
-                   data = training,
-                   method ='glmStepAIC',
-                   preProcess = c("center", "scale"),
-                   trControl = control,
-                   direction = "forward",
-                   trace = FALSE)
+                       data = training,
+                       method ='glmStepAIC',
+                       preProcess = c("center", "scale"),
+                       trControl = control,
+                       direction = "forward",
+                       trace = FALSE)
 fwdstep_model
 ```
 
@@ -334,11 +338,11 @@ rf_model
 
 ``` r
 gbm_model <- train(Shares ~ .,
-                     data = training,
-                     method = "gbm",
-                     trControl = control,
-                     preProcess = c("center", "scale"),
-                     verbose = FALSE)
+                   data = training,
+                   method = "gbm",
+                   trControl = control,
+                   preProcess = c("center", "scale"),
+                   verbose = FALSE)
 gbm_model
 ```
 
@@ -384,12 +388,12 @@ gbm_predict <- predict(gbm_model, newdata = testing)
 ## Model performance
 
 ``` r
-Lasso <- postResample(lasso_predict, obs = testing$Shares)
-Forward_Stepwise <- postResample(fwdstep_predict, obs = testing$Shares)
-Random_Forest <- postResample(rf_predict, obs = testing$Shares)
-Boosted_Tree <- postResample(gbm_predict, obs = testing$Shares)
+a <- postResample(lasso_predict, obs = testing$Shares)
+b <- postResample(fwdstep_predict, obs = testing$Shares)
+c <- postResample(rf_predict, obs = testing$Shares)
+d <- postResample(gbm_predict, obs = testing$Shares)
 
-table <- as_tibble(rbind(Lasso, Forward_Stepwise, Random_Forest, Boosted_Tree))
+table <- as_tibble(rbind(a, b, c, d))
 Model <- c("Lasso", "Forward_Stepwise", "Random_Forest", "Boosted_Tree")
 performance_table <- cbind(Model, table)
 performance_table
@@ -404,8 +408,7 @@ performance_table
 ### Best model by RMSE criteria
 
 ``` r
-min_RMSE <- performance_table %>% slice_min(RMSE)
-min_RMSE
+performance_table %>% slice_min(RMSE)
 ```
 
     ##           Model     RMSE    Rsquared      MAE
@@ -414,8 +417,7 @@ min_RMSE
 ### Best model by Rsquared criteria
 
 ``` r
-max_Rsquared <- performance_table %>% slice_max(Rsquared)
-max_Rsquared
+performance_table %>% slice_max(Rsquared)
 ```
 
     ##           Model     RMSE    Rsquared      MAE
