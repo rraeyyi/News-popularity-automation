@@ -3,6 +3,7 @@ Lifestyle Analysis
 Rachel Hencher and Yi Ren
 2022-11-02
 
+- <a href="#introduction" id="toc-introduction">Introduction</a>
 - <a href="#load-packages" id="toc-load-packages">Load packages</a>
 - <a href="#data" id="toc-data">Data</a>
   - <a href="#read-in-and-subset-data" id="toc-read-in-and-subset-data">Read
@@ -40,6 +41,35 @@ Rachel Hencher and Yi Ren
     - <a href="#best-model-by-rsquared-criteria"
       id="toc-best-model-by-rsquared-criteria">Best model by Rsquared
       criteria</a>
+
+# Introduction
+
+This report analyzes data on almost 40,000 articles published by
+Mashable throughout the years 2013 and 2014. Although the original data
+set includes information on 61 different features about the articles,
+this report focuses on the following 9 variables:
+
+| Name                 | Definition |
+|:---------------------|:-----------|
+| Channel              | a          |
+| Number_Title_Words   | b          |
+| Number_Content_Words | c          |
+| Number_Images        | d          |
+| Number_Videos        | e          |
+| Positive_Word_Rate   | f          |
+| Negative_Word_Rate   | g          |
+| Title_Polarity       | h          |
+| Weekday              | i          |
+| Shares               | j          |
+
+Variable Descriptions
+
+The purpose of this report is to look for patterns and to make
+predictions regarding the number of shares of articles.
+
+You should also mention the purpose of your analysis and the methods
+you’ll use to model the response. You’ll describe those in more detail
+later.
 
 # Load packages
 
@@ -87,6 +117,27 @@ news$Channel <- as.factor(ifelse(news$data_channel_is_lifestyle == 1, "Lifestyle
 news_final <- news %>%
   select(-c(starts_with("weekday_is"), starts_with("data_channel_is")))
 ```
+
+``` r
+news_final
+```
+
+    ## # A tibble: 39,644 × 10
+    ##    Number_Title_Words Number_Content_Words Number_Images Number_Videos
+    ##                 <dbl>                <dbl>         <dbl>         <dbl>
+    ##  1                 12                  219             1             0
+    ##  2                  9                  255             1             0
+    ##  3                  9                  211             1             0
+    ##  4                  9                  531             1             0
+    ##  5                 13                 1072            20             0
+    ##  6                 10                  370             0             0
+    ##  7                  8                  960            20             0
+    ##  8                 12                  989            20             0
+    ##  9                 11                   97             0             0
+    ## 10                 10                  231             1             1
+    ## # … with 39,634 more rows, and 6 more variables: Positive_Word_Rate <dbl>,
+    ## #   Negative_Word_Rate <dbl>, Title_Polarity <dbl>, Shares <dbl>,
+    ## #   Weekday <fct>, Channel <fct>
 
 ## Automation
 

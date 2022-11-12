@@ -13,6 +13,21 @@ params:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Introduction  
+This report analyzes data on almost 40,000 articles published by Mashable throughout the years 2013 and 2014. Although the original data set includes information on 61 different features about the articles, this report focuses on the following 9 variables:  
+
+```{r, echo=FALSE, results='asis'}
+Name <- c("Channel", "Number_Title_Words", "Number_Content_Words", "Number_Images", "Number_Videos", "Positive_Word_Rate", "Negative_Word_Rate", "Title_Polarity", "Weekday", "Shares")
+Definition <- c("a", "b", "c", "d", "e", "f", "g", "h", "i", "j")
+vars <- cbind(Name, Definition)
+knitr::kable(vars)
+```
+
+The purpose of this report is to look for patterns and to make predictions regarding the number of shares of articles.
+
+
+You should also mention the purpose of your analysis and the methods you’ll use to model the response. You’ll describe those in more detail later.
+
 # Load packages
 ```{r packages, message = FALSE}
 library(readr)
@@ -55,6 +70,10 @@ news$Channel <- as.factor(ifelse(news$data_channel_is_lifestyle == 1, "Lifestyle
                                                       ifelse(news$data_channel_is_tech == 1, "Tech", "World"))))))
 news_final <- news %>%
   select(-c(starts_with("weekday_is"), starts_with("data_channel_is")))
+```
+
+```{r}
+news_final
 ```
 
 ## Automation
