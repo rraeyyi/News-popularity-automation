@@ -52,8 +52,8 @@ Rachel Hencher and Yi Ren
 This report analyzes data on almost 40,000 articles published by
 Mashable throughout the years 2013 and 2014. Although the original data
 set includes information on 61 different features about the articles,
-this report excludes and condenses some of those and focuses on the
-following 9 variables:
+this report excludes some of those and condenses others so that we may
+focus on the following 10 variables:
 
 | Name                 | Definition                                                                       |
 |:---------------------|:---------------------------------------------------------------------------------|
@@ -160,7 +160,7 @@ stat <- training %>%
          Shares) %>% 
   apply(2, function(x){summary(x[!is.na(x)])}) 
 
-kable(stat, caption = "Summary Stats for All Variables", digits = 2)
+kable(stat, caption = "Summary Stats for Numeric Variables", digits = 2)
 ```
 
 |         | Number_Title_Words | Number_Content_Words | Number_Images | Number_Videos | Positive_Word_Rate | Negative_Word_Rate | Title_Polarity |    Shares |
@@ -172,19 +172,19 @@ kable(stat, caption = "Summary Stats for All Variables", digits = 2)
 | 3rd Qu. |              11.00 |               793.00 |          8.00 |          0.00 |               0.05 |               0.02 |           0.21 |   3225.00 |
 | Max.    |              18.00 |              8474.00 |        111.00 |         50.00 |               0.12 |               0.06 |           1.00 | 196700.00 |
 
-Summary Stats for All Variables
+Summary Stats for Numeric Variables
 
 ## Pairs plot
 
 The following graphic displays the correlation between each of the
 variables explored. There are several things to look out for… The
 correlation between `Shares`, our response, and each of the other
-variables, our predictors. A higher value close to -1 or 1 indicates the
-two variables are highly correlated. A value close to 0 indicates little
-to no correlation. Additionally, one should consider correlation between
-two predictor variables as well. A high correlation between two
-predictor variables is an indication of collinearity, which should be
-taken into account when creating models later.
+variables, our predictors. A value close to -1 or 1 indicates the two
+variables are highly correlated. A value close to 0 indicates little to
+no correlation. Additionally, we should consider correlation between two
+predictor variables as well. A high correlation between two predictor
+variables is an indication of collinearity, which should be taken into
+account when creating models later.
 
 ``` r
 training_sub <- training %>% 
@@ -211,6 +211,11 @@ ggplot(training, aes(x = Weekday)) +
 
 ## Boxplot of weekday vs shares
 
+The following boxplots display a five-number summary of shares for each
+day of the week. The axes are flipped, so if we wish to draw conclusions
+regarding which day may be best to maximize shares, we would look for a
+boxplot with a median furthest to the right.
+
 ``` r
 ggplot(training, aes(x = Weekday, y = Shares)) +
   geom_boxplot(color = "royal blue") +
@@ -222,6 +227,13 @@ ggplot(training, aes(x = Weekday, y = Shares)) +
 
 ## Scatterplot of title length & polarity vs shares
 
+The following scatterplot displays the number of shares for a given
+title length. The peak of the data, excluding outliers, indicates the
+title length that maximizes the number of shares. Additionally, the key
+displays the color coding for polarity of the title so that we can look
+for patterns to see whether the polarity of the title also has an effect
+on the number of shares.
+
 ``` r
 ggplot(training, aes(x = Number_Title_Words, y = Shares)) + 
   geom_point(aes(color = Title_Polarity))
@@ -230,6 +242,20 @@ ggplot(training, aes(x = Number_Title_Words, y = Shares)) +
 ![](Project3_files/figure-gfm/scatterplot-1.png)<!-- -->
 
 ## Scatterplots of negative & positive word rate vs shares
+
+The following two scatterplots compare the number of shares for a given
+positive word rate and negative word rate. The two graphs have been
+scaled the same so that they can be compared. If the data appears to
+peak further to the right on the positive rate graph and further to the
+left on the negative rate graph, we might conclude that having a higher
+percentage of positive words will yield more shares. If the data appears
+to peak further to the right on the negative rate graph and further to
+the left on the positive rate graph, we might conclude that having a
+higher percentage of negative words will yield more shares.
+Additionally, each graph displays the correlation between shares and
+positve or negative word rate. Again, a value of R closer to -1 or 1
+would indicate the two variables are highly correlated and a value
+closer to 0 would indicate little to no correlation.
 
 ``` r
 ggplot(training, aes(x = Positive_Word_Rate, y = Shares)) + 
