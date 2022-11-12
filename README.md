@@ -16,10 +16,11 @@ library(rmarkdown)
 # Automation for reports
 ```{r}
 channel <- c("Lifestyle", "Entertainment", "Bus", "Socmed", "Tech", "World")
-for (i in 1:length(channel)){
-  render("Channel_Analysis.Rmd", 
-         params = list(channel = i), 
+report <- function(channel){
+  render("Project3.Rmd", 
+         params = list(channel = channel), 
          output_file = paste0(channel, ".md"))
+}
 ```
 # Links to each reports
 + The analysis for [Lifestyle](LifestyleAnalysis.html).
