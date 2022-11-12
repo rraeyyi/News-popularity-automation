@@ -175,5 +175,18 @@ Forward_Stepwise <- postResample(fwdstep_predict, obs = testing$Shares)
 Random_Forest <- postResample(rf_predict, obs = testing$Shares)
 Boosted_Tree <- postResample(gbm_predict, obs = testing$Shares)
 
-rbind(Lasso, Forward_Stepwise, Random_Forest, Boosted_Tree)
+table <- as_tibble(rbind(Lasso, Forward_Stepwise, Random_Forest, Boosted_Tree))
+Model <- c("Lasso", "Forward_Stepwise", "Random_Forest", "Boosted_Tree")
+performance_table <- cbind(Model, table)
+performance_table
+```
+
+### Best model by RMSE criteria
+```{r rmse}
+performance_table %>% slice_min(RMSE)
+```
+
+### Best model by Rsquared criteria
+```{r rsquared}
+performance_table %>% slice_max(Rsquared)
 ```
