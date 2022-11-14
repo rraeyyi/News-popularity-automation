@@ -21,6 +21,7 @@ report <- function(channel){
          params = list(channel = channel), 
          output_file = paste0(channel, ".md"))
 }
+lapply(channel, report)
 ```
 # Links to each reports
 + The analysis for [Lifestyle](LifestyleAnalysis.html).
