@@ -133,6 +133,13 @@ news_data <- news_final %>%
 
 ## Split data into train and test
 
+The `createDataPartition` function from the `caret` package allows us to
+easily split our data into a training and test set with 70% of the data
+designated to the training set. We will generate our models using the
+training data and then make predictions using the testing data so that
+we can have a measure of how well our model fits data not actually used
+in the model.
+
 ``` r
 set.seed(216)
 intrain <- createDataPartition(news_data$Shares, p = 0.7, list = FALSE)
@@ -285,19 +292,22 @@ what we will be doing in the next and final section.
 
 ## Set up cross validation
 
+The below sets up the cross-validation for our models. All models will
+also utilize the `preProcess` argument in order to standardize the data.
+
 ``` r
 control <- trainControl(method = "cv", number = 5)
 ```
 
-In linear regression, we generate a model by minimizing the sum of
-squared residuals. Three of the most common variable selection
-techniques for linear regression are: hypothesis testing based methods
-(forward stepwise, backward stepwise, best subset selection),
-penalization based methods (LASSO, Elastic Net, SCAD), and removing
-variables based on collinearity. Below, we will generate our models
-using the penalization based LASSO method and the hypothesis testing
-forward stepwise selection method. It should be noted that these methods
-do not include interactions, quadratics, etc.
+In linear regression, we generate a model where we fit betas by
+minimizing the sum of the squared residuals. Three of the most common
+variable selection techniques for linear regression are: hypothesis
+testing based methods (forward stepwise, backward stepwise, best subset
+selection), penalization based methods (LASSO, Elastic Net, SCAD), and
+removing variables based on collinearity. Below, we will generate our
+models using the penalization based LASSO method and the hypothesis
+testing forward stepwise selection method. It should be noted that these
+methods do not include interactions, quadratics, etc.
 
 ## LASSO model
 
@@ -506,6 +516,9 @@ gbm_model
 # Comparison
 
 ## Apply model for prediction
+
+We make our predictions on the data not used to generate the model, the
+testing data, so that we may reduce bias.
 
 ``` r
 lasso_predict <- predict(lasso_model, newdata = testing)
