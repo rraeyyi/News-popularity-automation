@@ -187,7 +187,9 @@ fwdstep_model <- train(Shares ~ .,
 fwdstep_model
 ```
 
-## Tree models  
+## Ensemble models
+Ensemble modeling is a process where multiple diverse models are created to predict an outcome, either by using different modeling algorithms or using different training data sets. Each weak learner is fitted on the training set and provides predictions obtained. The final prediction result is computed by combining the results from all the weak learners. Thus, ensemble learning techniques have been proven to yield better performance on machine learning problems.
+
 ### Random forest model   
 While the previously mentioned models can both be used for interpretation and prediction, random forest models can only be used for prediction. Like a bagged tree model, we first create bootstrap sample, then train tree on this sample, repeat, and either average or use majority vote for final prediction depending on whether our predictors are continuous or categorical respectively. However, random forest models extends the idea of bagging and is usually better, but instead of including every predictor in each one of our trees, we only include a random subset of predictors. In the random forest model below, we include *p/3* predictors since out data is continuous.
 ```{r rf}
