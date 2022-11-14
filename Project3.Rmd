@@ -1,7 +1,7 @@
 ---
-title: "Lifestyle Analysis"
+title: "`r params$channel` Analysis"
 author: "Rachel Hencher and Yi Ren"
-date: "2022-11-02"
+date: "`r Sys.Date()`"
 output: 
   rmarkdown::github_document:
     toc: yes
