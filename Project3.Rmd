@@ -151,11 +151,15 @@ ggplot(training, aes(x = Negative_Word_Rate, y = Shares)) +
   xlim(0, 0.125) + ylim(0, 250000)
 ```
 
-# Modeling
+# Modeling  
+Throughout this section of the report we utilize two supervised learning methods, linear regression and tree models, in order to investigate our response, `Shares`. In supervised learning, we often wish to make inference on the model or may want to predict the response, which is what we will be doing in the next and final section.  
+
 ## Set up cross validation
 ```{r control}
 control <- trainControl(method = "cv", number = 5)
 ```
+
+In linear regression, we generate a model by minimizing the sum of squared residuals. Three of the most common variable selection techniques for linear regression are: hypothesis testing based methods (forward stepwise, backward stepwise, best subset selection), penalization based methods (LASSO, Elastic Net, SCAD), and removing variables based on collinearity. Below, we will generate our models using the penalization based LASSO method and the hypothesis testing forward stepwise selection method. It should be noted that these methods do not include interactions, quadratics, etc.   
 
 ## LASSO model
 ```{r lasso}
@@ -180,18 +184,20 @@ fwdstep_model <- train(Shares ~ .,
 fwdstep_model
 ```
 
-## Random forest model
+## Random forest model   
+While the previously mentioned models can both be used for interpretation and prediction, random forest models can only be used for prediction. Like a bagged tree model, we first create bootstrap sample, then train tree on this sample, repeat, and either average or use majority vote for final prediction depending on whether our predictors are continuous or categorical respectively. However, random forest models extends the idea of bagging and is usually better, but instead of including every predictor in each one of our trees, we only include a random subset of predictors. In the random forest model below, we include *p/3* predictors since out data is continuous.
 ```{r rf}
 rf_model <- train(Shares ~ ., 
                   data = training, 
                   method = "rf", 
                   preProcess = c("center", "scale"), 
                   trControl = control, 
-                  tuneGrid = expand.grid(mtry = 1:(ncol(training) - 1)))
+                  tuneGrid = expand.grid(mtry = 1:((ncol(training) - 1)/3)))
 rf_model
 ```
                          
-## Boosted tree model
+## Boosted tree model  
+Similarly to the random forest model above, a boosted tree model can look at variable importance measures and make predictions, but loses interpretability. A boosted tree model involves the slow training of trees. We begin by initializing predictions as 0, then find the residuals, fit a tree with *d* splits, update the predictors, and finally update the residuals and repeat.
 ```{r gbm}
 gbm_model <- train(Shares ~ .,
                    data = training,

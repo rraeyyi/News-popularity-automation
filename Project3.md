@@ -277,11 +277,27 @@ ggplot(training, aes(x = Negative_Word_Rate, y = Shares)) +
 
 # Modeling
 
+Throughout this section of the report we utilize two supervised learning
+methods, linear regression and tree models, in order to investigate our
+response, `Shares`. In supervised learning, we often wish to make
+inference on the model or may want to predict the response, which is
+what we will be doing in the next and final section.
+
 ## Set up cross validation
 
 ``` r
 control <- trainControl(method = "cv", number = 5)
 ```
+
+In linear regression, we generate a model by minimizing the sum of
+squared residuals. Three of the most common variable selection
+techniques for linear regression are: hypothesis testing based methods
+(forward stepwise, backward stepwise, best subset selection),
+penalization based methods (LASSO, Elastic Net, SCAD), and removing
+variables based on collinearity. Below, we will generate our models
+using the penalization based LASSO method and the hypothesis testing
+forward stepwise selection method. It should be noted that these methods
+do not include interactions, quadratics, etc.
 
 ## LASSO model
 
@@ -402,13 +418,24 @@ fwdstep_model
 
 ## Random forest model
 
+While the previously mentioned models can both be used for
+interpretation and prediction, random forest models can only be used for
+prediction. Like a bagged tree model, we first create bootstrap sample,
+then train tree on this sample, repeat, and either average or use
+majority vote for final prediction depending on whether our predictors
+are continuous or categorical respectively. However, random forest
+models extends the idea of bagging and is usually better, but instead of
+including every predictor in each one of our trees, we only include a
+random subset of predictors. In the random forest model below, we
+include *p/3* predictors since out data is continuous.
+
 ``` r
 rf_model <- train(Shares ~ ., 
                   data = training, 
                   method = "rf", 
                   preProcess = c("center", "scale"), 
                   trControl = control, 
-                  tuneGrid = expand.grid(mtry = 1:(ncol(training) - 1)))
+                  tuneGrid = expand.grid(mtry = 1:((ncol(training) - 1)/3)))
 rf_model
 ```
 
@@ -423,19 +450,20 @@ rf_model
     ## Resampling results across tuning parameters:
     ## 
     ##   mtry  RMSE      Rsquared     MAE     
-    ##   1     7586.169  0.006679430  3300.900
-    ##   2     7712.214  0.008337636  3323.908
-    ##   3     7828.531  0.008338324  3373.902
-    ##   4     8030.110  0.007156748  3432.893
-    ##   5     8152.765  0.007106801  3460.842
-    ##   6     8262.927  0.006602226  3484.894
-    ##   7     8398.355  0.007539878  3501.446
-    ##   8     8441.366  0.006237354  3508.179
+    ##   1     7609.380  0.006580823  3297.881
+    ##   2     7720.388  0.009112575  3333.962
     ## 
     ## RMSE was used to select the optimal model using the smallest value.
     ## The final value used for the model was mtry = 1.
 
 ## Boosted tree model
+
+Similarly to the random forest model above, a boosted tree model can
+look at variable importance measures and make predictions, but loses
+interpretability. A boosted tree model involves the slow training of
+trees. We begin by initializing predictions as 0, then find the
+residuals, fit a tree with *d* splits, update the predictors, and
+finally update the residuals and repeat.
 
 ``` r
 gbm_model <- train(Shares ~ .,
@@ -454,26 +482,26 @@ gbm_model
     ## 
     ## Pre-processing: centered (13), scaled (13) 
     ## Resampling: Cross-Validated (5 fold) 
-    ## Summary of sample sizes: 1177, 1178, 1177, 1178, 1178 
+    ## Summary of sample sizes: 1176, 1178, 1177, 1177, 1180 
     ## Resampling results across tuning parameters:
     ## 
     ##   interaction.depth  n.trees  RMSE      Rsquared     MAE     
-    ##   1                   50      8019.673  0.002085941  3400.290
-    ##   1                  100      8039.321  0.001504858  3425.814
-    ##   1                  150      8029.943  0.001910256  3403.265
-    ##   2                   50      8067.431  0.001081430  3415.035
-    ##   2                  100      8066.735  0.002712858  3413.244
-    ##   2                  150      8144.404  0.003573107  3473.736
-    ##   3                   50      8104.459  0.008447615  3481.266
-    ##   3                  100      8079.077  0.007754760  3451.902
-    ##   3                  150      8267.039  0.008276244  3626.735
+    ##   1                   50      8114.832  0.003245895  3365.566
+    ##   1                  100      8102.493  0.004796803  3366.177
+    ##   1                  150      8113.108  0.006096341  3370.063
+    ##   2                   50      8075.318  0.008932715  3341.457
+    ##   2                  100      8113.889  0.011477376  3367.361
+    ##   2                  150      8188.133  0.005888259  3421.047
+    ##   3                   50      8057.418  0.013821902  3381.761
+    ##   3                  100      8167.135  0.015418934  3478.222
+    ##   3                  150      8262.888  0.012656520  3580.348
     ## 
     ## Tuning parameter 'shrinkage' was held constant at a value of 0.1
     ## 
     ## Tuning parameter 'n.minobsinnode' was held constant at a value of 10
     ## RMSE was used to select the optimal model using the smallest value.
     ## The final values used for the model were n.trees = 50, interaction.depth =
-    ##  1, shrinkage = 0.1 and n.minobsinnode = 10.
+    ##  3, shrinkage = 0.1 and n.minobsinnode = 10.
 
 # Comparison
 
@@ -503,8 +531,8 @@ performance_table
     ##              Model     RMSE    Rsquared      MAE
     ## 1            Lasso 9650.057 0.005337779 3285.077
     ## 2 Forward_Stepwise 9646.664 0.004534141 3246.652
-    ## 3    Random_Forest 9637.121 0.005537998 3189.949
-    ## 4     Boosted_Tree 9695.017 0.004761231 3284.014
+    ## 3    Random_Forest 9642.975 0.004398112 3189.987
+    ## 4     Boosted_Tree 9746.785 0.002727183 3265.054
 
 ### Best model by RMSE criteria
 
@@ -513,7 +541,7 @@ performance_table %>% slice_min(RMSE)
 ```
 
     ##           Model     RMSE    Rsquared      MAE
-    ## 1 Random_Forest 9637.121 0.005537998 3189.949
+    ## 1 Random_Forest 9642.975 0.004398112 3189.987
 
 ### Best model by Rsquared criteria
 
@@ -521,5 +549,5 @@ performance_table %>% slice_min(RMSE)
 performance_table %>% slice_max(Rsquared)
 ```
 
-    ##           Model     RMSE    Rsquared      MAE
-    ## 1 Random_Forest 9637.121 0.005537998 3189.949
+    ##   Model     RMSE    Rsquared      MAE
+    ## 1 Lasso 9650.057 0.005337779 3285.077
