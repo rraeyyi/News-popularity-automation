@@ -29,4 +29,4 @@ lapply(channel, report)
 + The analysis for [Bus](Bus.html).
 + The analysis for [Socmed](Socmed.html).
 + The analysis for [Tech](Tech.html).
-+ The analysis for [World](World.html).
++ The analysis for [World](World.md).
