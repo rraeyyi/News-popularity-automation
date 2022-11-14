@@ -1,38 +1,54 @@
 Tech Analysis
 ================
 Rachel Hencher and Yi Ren
-2022-11-13
+2022-11-14
 
--   [Introduction](#introduction)
--   [Load packages](#load-packages)
--   [Data](#data)
-    -   [Read in and subset data](#read-in-and-subset-data)
-    -   [Automation](#automation)
-    -   [Split data into train and
-        test](#split-data-into-train-and-test)
--   [Summarization](#summarization)
-    -   [Numeric summaries](#numeric-summaries)
-    -   [Pairs plot](#pairs-plot)
-    -   [Barplot for weekday](#barplot-for-weekday)
-    -   [Boxplot of weekday vs shares](#boxplot-of-weekday-vs-shares)
-    -   [Scatterplot of title length & polarity vs
-        shares](#scatterplot-of-title-length--polarity-vs-shares)
-    -   [Scatterplots of negative & positive word rate vs
-        shares](#scatterplots-of-negative--positive-word-rate-vs-shares)
--   [Modeling](#modeling)
-    -   [Set up cross validation](#set-up-cross-validation)
-    -   [Linear regression models](#linear-regression-models)
-        -   [LASSO model](#lasso-model)
-        -   [Forward stepwise model](#forward-stepwise-model)
-    -   [Ensemble models](#ensemble-models)
-        -   [Random forest model](#random-forest-model)
-        -   [Boosted tree model](#boosted-tree-model)
--   [Comparison](#comparison)
-    -   [Apply model for prediction](#apply-model-for-prediction)
-    -   [Model performance](#model-performance)
-        -   [Best model by RMSE criteria](#best-model-by-rmse-criteria)
-        -   [Best model by Rsquared
-            criteria](#best-model-by-rsquared-criteria)
+- <a href="#introduction" id="toc-introduction">Introduction</a>
+- <a href="#load-packages" id="toc-load-packages">Load packages</a>
+- <a href="#data" id="toc-data">Data</a>
+  - <a href="#read-in-and-subset-data" id="toc-read-in-and-subset-data">Read
+    in and subset data</a>
+  - <a href="#automation" id="toc-automation">Automation</a>
+  - <a href="#split-data-into-train-and-test"
+    id="toc-split-data-into-train-and-test">Split data into train and
+    test</a>
+- <a href="#summarization" id="toc-summarization">Summarization</a>
+  - <a href="#numeric-summaries" id="toc-numeric-summaries">Numeric
+    summaries</a>
+  - <a href="#pairs-plot" id="toc-pairs-plot">Pairs plot</a>
+  - <a href="#barplot-for-weekday" id="toc-barplot-for-weekday">Barplot for
+    weekday</a>
+  - <a href="#boxplot-of-weekday-vs-shares"
+    id="toc-boxplot-of-weekday-vs-shares">Boxplot of weekday vs shares</a>
+  - <a href="#scatterplot-of-title-length--polarity-vs-shares"
+    id="toc-scatterplot-of-title-length--polarity-vs-shares">Scatterplot of
+    title length &amp; polarity vs shares</a>
+  - <a href="#scatterplots-of-negative--positive-word-rate-vs-shares"
+    id="toc-scatterplots-of-negative--positive-word-rate-vs-shares">Scatterplots
+    of negative &amp; positive word rate vs shares</a>
+- <a href="#modeling" id="toc-modeling">Modeling</a>
+  - <a href="#set-up-cross-validation" id="toc-set-up-cross-validation">Set
+    up cross validation</a>
+  - <a href="#linear-regression-models"
+    id="toc-linear-regression-models">Linear regression models</a>
+    - <a href="#lasso-model" id="toc-lasso-model">LASSO model</a>
+    - <a href="#forward-stepwise-model"
+      id="toc-forward-stepwise-model">Forward stepwise model</a>
+  - <a href="#ensemble-models" id="toc-ensemble-models">Ensemble models</a>
+    - <a href="#random-forest-model" id="toc-random-forest-model">Random
+      forest model</a>
+    - <a href="#boosted-tree-model" id="toc-boosted-tree-model">Boosted tree
+      model</a>
+- <a href="#comparison" id="toc-comparison">Comparison</a>
+  - <a href="#apply-model-for-prediction"
+    id="toc-apply-model-for-prediction">Apply model for prediction</a>
+  - <a href="#model-performance" id="toc-model-performance">Model
+    performance</a>
+    - <a href="#best-model-by-rmse-criteria"
+      id="toc-best-model-by-rmse-criteria">Best model by RMSE criteria</a>
+    - <a href="#best-model-by-rsquared-criteria"
+      id="toc-best-model-by-rsquared-criteria">Best model by Rsquared
+      criteria</a>
 
 # Introduction
 
@@ -258,11 +274,9 @@ ggplot(training, aes(x = Positive_Word_Rate, y = Shares)) +
   xlim(0, 0.125) + ylim(0, 250000)
 ```
 
-    ## Warning: Removed 1 rows containing non-finite values
-    ## (stat_cor).
+    ## Warning: Removed 1 rows containing non-finite values (stat_cor).
 
-    ## Warning: Removed 1 rows containing missing values
-    ## (geom_point).
+    ## Warning: Removed 1 rows containing missing values (geom_point).
 
 ![](Tech_files/figure-gfm/scatterplot2-1.png)<!-- -->
 
@@ -319,121 +333,43 @@ predict(lasso_model$finalModel, type = "coef")
     ##  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14
     ## 
     ## $fraction
-    ##  [1] 0.00000000 0.07692308 0.15384615
-    ##  [4] 0.23076923 0.30769231 0.38461538
-    ##  [7] 0.46153846 0.53846154 0.61538462
-    ## [10] 0.69230769 0.76923077 0.84615385
+    ##  [1] 0.00000000 0.07692308 0.15384615 0.23076923 0.30769231 0.38461538 0.46153846 0.53846154 0.61538462 0.69230769 0.76923077 0.84615385
     ## [13] 0.92307692 1.00000000
     ## 
     ## $mode
     ## [1] "step"
     ## 
     ## $coefficients
-    ##    Number_Title_Words Number_Content_Words
-    ## 0            0.000000              0.00000
-    ## 1            0.000000             30.66208
-    ## 2           -2.485325             33.14741
-    ## 3          -36.849009             66.05071
-    ## 4          -39.431349             68.21927
-    ## 5         -124.382061            136.86489
-    ## 6         -127.046605            138.99720
-    ## 7         -141.196161            149.06185
-    ## 8         -147.022325            154.38172
-    ## 9         -208.117045            203.68614
-    ## 10        -212.390032            207.16275
-    ## 11        -217.650367            209.50265
-    ## 12        -241.032785            220.34980
-    ## 13        -258.426818            229.40940
-    ##    Number_Images Number_Videos
-    ## 0        0.00000      0.000000
-    ## 1        0.00000      0.000000
-    ## 2        0.00000      0.000000
-    ## 3        0.00000      0.000000
-    ## 4        0.00000      2.372792
-    ## 5        0.00000     82.791403
-    ## 6        0.00000     85.268364
-    ## 7        0.00000     98.366008
-    ## 8        0.00000    103.871242
-    ## 9        0.00000    160.938452
-    ## 10       0.00000    164.904657
-    ## 11       3.82055    170.162376
-    ## 12      23.16318    194.187455
-    ## 13      36.96562    212.848783
-    ##    Positive_Word_Rate Negative_Word_Rate
-    ## 0            0.000000            0.00000
-    ## 1            0.000000            0.00000
-    ## 2            0.000000            0.00000
-    ## 3            0.000000            0.00000
-    ## 4            0.000000            0.00000
-    ## 5            0.000000            0.00000
-    ## 6            0.000000            0.00000
-    ## 7            0.000000            0.00000
-    ## 8           -8.245147            0.00000
-    ## 9          -97.605708           58.98188
-    ## 10        -103.694089           62.96898
-    ## 11        -111.306285           68.23415
-    ## 12        -147.058870           93.31240
-    ## 13        -173.230445          110.89670
-    ##    Title_Polarity WeekdayMonday
-    ## 0         0.00000        0.0000
-    ## 1         0.00000        0.0000
-    ## 2         0.00000        0.0000
-    ## 3         0.00000        0.0000
-    ## 4         0.00000        0.0000
-    ## 5         0.00000        0.0000
-    ## 6         0.00000        0.0000
-    ## 7        11.55025        0.0000
-    ## 8        17.54964        0.0000
-    ## 9        86.62503        0.0000
-    ## 10       91.40496        0.0000
-    ## 11       97.22672        0.0000
-    ## 12      124.48976      -40.1266
-    ## 13      144.61782     -108.9054
-    ##    WeekdaySaturday WeekdaySunday
-    ## 0          0.00000       0.00000
-    ## 1          0.00000       0.00000
-    ## 2          0.00000       0.00000
-    ## 3          0.00000      33.06493
-    ## 4          0.00000      35.45486
-    ## 5         86.76720     120.96072
-    ## 6         89.19022     123.38391
-    ## 7        101.07872     135.72347
-    ## 8        106.62017     140.92243
-    ## 9        164.09532     194.63900
-    ## 10       167.25791     197.65906
-    ## 11       171.25394     201.53557
-    ## 12       180.21449     211.25514
-    ## 13       160.23082     195.61014
-    ##    WeekdayThursday WeekdayTuesday
-    ## 0         0.000000        0.00000
-    ## 1         0.000000        0.00000
-    ## 2         0.000000        0.00000
-    ## 3         0.000000        0.00000
-    ## 4         0.000000        0.00000
-    ## 5         0.000000        0.00000
-    ## 6        -1.985568        0.00000
-    ## 7       -12.877226        0.00000
-    ## 8       -17.652423        0.00000
-    ## 9       -66.992660        0.00000
-    ## 10      -71.550484        0.00000
-    ## 11      -77.154097        0.00000
-    ## 12     -116.666576        0.00000
-    ## 13     -185.500198      -69.14869
-    ##    WeekdayWednesday
-    ## 0          0.000000
-    ## 1          0.000000
-    ## 2          0.000000
-    ## 3          0.000000
-    ## 4          0.000000
-    ## 5          0.000000
-    ## 6          0.000000
-    ## 7          0.000000
-    ## 8          0.000000
-    ## 9          0.000000
-    ## 10        -4.332257
-    ## 11        -9.629247
-    ## 12       -48.154407
-    ## 13      -117.597795
+    ##    Number_Title_Words Number_Content_Words Number_Images Number_Videos Positive_Word_Rate Negative_Word_Rate Title_Polarity WeekdayMonday
+    ## 0            0.000000              0.00000       0.00000      0.000000           0.000000            0.00000        0.00000        0.0000
+    ## 1            0.000000             30.66208       0.00000      0.000000           0.000000            0.00000        0.00000        0.0000
+    ## 2           -2.485325             33.14741       0.00000      0.000000           0.000000            0.00000        0.00000        0.0000
+    ## 3          -36.849009             66.05071       0.00000      0.000000           0.000000            0.00000        0.00000        0.0000
+    ## 4          -39.431349             68.21927       0.00000      2.372792           0.000000            0.00000        0.00000        0.0000
+    ## 5         -124.382061            136.86489       0.00000     82.791403           0.000000            0.00000        0.00000        0.0000
+    ## 6         -127.046605            138.99720       0.00000     85.268364           0.000000            0.00000        0.00000        0.0000
+    ## 7         -141.196161            149.06185       0.00000     98.366008           0.000000            0.00000       11.55025        0.0000
+    ## 8         -147.022325            154.38172       0.00000    103.871242          -8.245147            0.00000       17.54964        0.0000
+    ## 9         -208.117045            203.68614       0.00000    160.938452         -97.605708           58.98188       86.62503        0.0000
+    ## 10        -212.390032            207.16275       0.00000    164.904657        -103.694089           62.96898       91.40496        0.0000
+    ## 11        -217.650367            209.50265       3.82055    170.162376        -111.306285           68.23415       97.22672        0.0000
+    ## 12        -241.032785            220.34980      23.16318    194.187455        -147.058870           93.31240      124.48976      -40.1266
+    ## 13        -258.426818            229.40940      36.96562    212.848783        -173.230445          110.89670      144.61782     -108.9054
+    ##    WeekdaySaturday WeekdaySunday WeekdayThursday WeekdayTuesday WeekdayWednesday
+    ## 0          0.00000       0.00000        0.000000        0.00000         0.000000
+    ## 1          0.00000       0.00000        0.000000        0.00000         0.000000
+    ## 2          0.00000       0.00000        0.000000        0.00000         0.000000
+    ## 3          0.00000      33.06493        0.000000        0.00000         0.000000
+    ## 4          0.00000      35.45486        0.000000        0.00000         0.000000
+    ## 5         86.76720     120.96072        0.000000        0.00000         0.000000
+    ## 6         89.19022     123.38391       -1.985568        0.00000         0.000000
+    ## 7        101.07872     135.72347      -12.877226        0.00000         0.000000
+    ## 8        106.62017     140.92243      -17.652423        0.00000         0.000000
+    ## 9        164.09532     194.63900      -66.992660        0.00000         0.000000
+    ## 10       167.25791     197.65906      -71.550484        0.00000        -4.332257
+    ## 11       171.25394     201.53557      -77.154097        0.00000        -9.629247
+    ## 12       180.21449     211.25514     -116.666576        0.00000       -48.154407
+    ## 13       160.23082     195.61014     -185.500198      -69.14869      -117.597795
 
 ``` r
 lasso_model$bestTune
@@ -515,10 +451,8 @@ rf_model
     ##   1     4857.292  0.01544636  2206.089
     ##   2     4857.718  0.01640413  2218.328
     ## 
-    ## RMSE was used to select the optimal
-    ##  model using the smallest value.
-    ## The final value used for the model was mtry
-    ##  = 1.
+    ## RMSE was used to select the optimal model using the smallest value.
+    ## The final value used for the model was mtry = 1.
 
 ### Boosted tree model
 
@@ -539,10 +473,8 @@ gbm_model <- train(Shares ~ .,
 gbm_model$bestTune
 ```
 
-    ##   n.trees interaction.depth shrinkage
-    ## 1      50                 1       0.1
-    ##   n.minobsinnode
-    ## 1             10
+    ##   n.trees interaction.depth shrinkage n.minobsinnode
+    ## 1      50                 1       0.1             10
 
 ``` r
 plot(gbm_model)
@@ -589,16 +521,11 @@ performance_table <- cbind(Model, table)
 performance_table
 ```
 
-    ##              Model     RMSE    Rsquared
-    ## 1            Lasso 14667.56 0.003205937
-    ## 2 Forward_Stepwise 14660.67 0.003602336
-    ## 3    Random_Forest 14660.39 0.006117812
-    ## 4     Boosted_Tree 14664.31 0.003022742
-    ##        MAE
-    ## 1 2475.360
-    ## 2 2471.183
-    ## 3 2462.441
-    ## 4 2468.909
+    ##              Model     RMSE    Rsquared      MAE
+    ## 1            Lasso 14667.56 0.003205937 2475.360
+    ## 2 Forward_Stepwise 14660.67 0.003602336 2471.183
+    ## 3    Random_Forest 14660.39 0.006117812 2462.441
+    ## 4     Boosted_Tree 14664.31 0.003022742 2468.909
 
 ### Best model by RMSE criteria
 
