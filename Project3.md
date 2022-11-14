@@ -529,6 +529,10 @@ gbm_predict <- predict(gbm_model, newdata = testing)
 
 ## Model performance
 
+We use the `postResample` function in order to find common metrics which
+we can use to compare models. The aim is to minimize RMSE and maximize
+Rsquared.
+
 ``` r
 a <- postResample(lasso_predict, obs = testing$Shares)
 b <- postResample(fwdstep_predict, obs = testing$Shares)
