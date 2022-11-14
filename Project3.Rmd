@@ -211,8 +211,11 @@ gbm_model <- train(Shares ~ .,
                    trControl = control,
                    preProcess = c("center", "scale"),
                    verbose = FALSE)
-gbm_model
+gbm_model$bestTune
+plot(gbm_model)
 ```
+
+As the output suggested, we can use the best tuning information to predict our interest. Shrinkage parameter lambda controls the rate at which boosting learns. The number of splits in each tree, which controls the complexity of the boosted ensemble (controlled with max.depth). We can also visual the relationship between number of iterations and RMSE under the cross validation. 
 
 # Comparison
 ## Apply model for prediction  
