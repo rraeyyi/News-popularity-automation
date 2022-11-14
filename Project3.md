@@ -29,13 +29,16 @@ Rachel Hencher and Yi Ren
 - <a href="#modeling" id="toc-modeling">Modeling</a>
   - <a href="#set-up-cross-validation" id="toc-set-up-cross-validation">Set
     up cross validation</a>
-  - <a href="#lasso-model" id="toc-lasso-model">LASSO model</a>
-  - <a href="#forward-stepwise-model"
-    id="toc-forward-stepwise-model">Forward stepwise model</a>
-  - <a href="#random-forest-model" id="toc-random-forest-model">Random
-    forest model</a>
-  - <a href="#boosted-tree-model" id="toc-boosted-tree-model">Boosted tree
-    model</a>
+  - <a href="#linear-regression-models"
+    id="toc-linear-regression-models">Linear regression models</a>
+    - <a href="#lasso-model" id="toc-lasso-model">LASSO model</a>
+    - <a href="#forward-stepwise-model"
+      id="toc-forward-stepwise-model">Forward stepwise model</a>
+  - <a href="#tree-models" id="toc-tree-models">Tree models</a>
+    - <a href="#random-forest-model" id="toc-random-forest-model">Random
+      forest model</a>
+    - <a href="#boosted-tree-model" id="toc-boosted-tree-model">Boosted tree
+      model</a>
 - <a href="#comparison" id="toc-comparison">Comparison</a>
   - <a href="#apply-model-for-prediction"
     id="toc-apply-model-for-prediction">Apply model for prediction</a>
@@ -299,6 +302,8 @@ also utilize the `preProcess` argument in order to standardize the data.
 control <- trainControl(method = "cv", number = 5)
 ```
 
+## Linear regression models
+
 In linear regression, we generate a model where we fit betas by
 minimizing the sum of the squared residuals. Three of the most common
 variable selection techniques for linear regression are: hypothesis
@@ -309,7 +314,7 @@ models using the penalization based LASSO method and the hypothesis
 testing forward stepwise selection method. It should be noted that these
 methods do not include interactions, quadratics, etc.
 
-## LASSO model
+### LASSO model
 
 ``` r
 lasso_model <- train(Shares ~ .,
@@ -400,7 +405,7 @@ lasso_model$bestTune
     ##   fraction
     ## 1      0.1
 
-## Forward stepwise model
+### Forward stepwise model
 
 ``` r
 fwdstep_model <- train(Shares ~ .,
@@ -426,7 +431,9 @@ fwdstep_model
     ##   RMSE      Rsquared     MAE     
     ##   8071.276  0.004286913  3351.775
 
-## Random forest model
+## Tree models
+
+### Random forest model
 
 While the previously mentioned models can both be used for
 interpretation and prediction, random forest models can only be used for
@@ -466,7 +473,7 @@ rf_model
     ## RMSE was used to select the optimal model using the smallest value.
     ## The final value used for the model was mtry = 1.
 
-## Boosted tree model
+### Boosted tree model
 
 Similarly to the random forest model above, a boosted tree model can
 look at variable importance measures and make predictions, but loses
