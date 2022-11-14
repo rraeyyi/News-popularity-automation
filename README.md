@@ -1,5 +1,6 @@
 # Project3
 
+![](https://images.squarespace-cdn.com/content/v1/568f9ea70ab377cb54b16efb/067837d1-6426-457d-8872-76b54494fff1/news1-08746fa1.jpg?format=750w)
 # Purpose of project
 Our goal is to read in and analyze an online [news popularity data set](https://archive.ics.uci.edu/ml/datasets/Online+News+Popularity) to create predictive models for the number of shares and automating Markdown reports based on each channel of interests.
 
