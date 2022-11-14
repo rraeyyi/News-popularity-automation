@@ -1,54 +1,38 @@
 Lifestyle Analysis
 ================
 Rachel Hencher and Yi Ren
-2022-11-02
+2022-11-13
 
-- <a href="#introduction" id="toc-introduction">Introduction</a>
-- <a href="#load-packages" id="toc-load-packages">Load packages</a>
-- <a href="#data" id="toc-data">Data</a>
-  - <a href="#read-in-and-subset-data" id="toc-read-in-and-subset-data">Read
-    in and subset data</a>
-  - <a href="#automation" id="toc-automation">Automation</a>
-  - <a href="#split-data-into-train-and-test"
-    id="toc-split-data-into-train-and-test">Split data into train and
-    test</a>
-- <a href="#summarization" id="toc-summarization">Summarization</a>
-  - <a href="#numeric-summaries" id="toc-numeric-summaries">Numeric
-    summaries</a>
-  - <a href="#pairs-plot" id="toc-pairs-plot">Pairs plot</a>
-  - <a href="#barplot-for-weekday" id="toc-barplot-for-weekday">Barplot for
-    weekday</a>
-  - <a href="#boxplot-of-weekday-vs-shares"
-    id="toc-boxplot-of-weekday-vs-shares">Boxplot of weekday vs shares</a>
-  - <a href="#scatterplot-of-title-length--polarity-vs-shares"
-    id="toc-scatterplot-of-title-length--polarity-vs-shares">Scatterplot of
-    title length &amp; polarity vs shares</a>
-  - <a href="#scatterplots-of-negative--positive-word-rate-vs-shares"
-    id="toc-scatterplots-of-negative--positive-word-rate-vs-shares">Scatterplots
-    of negative &amp; positive word rate vs shares</a>
-- <a href="#modeling" id="toc-modeling">Modeling</a>
-  - <a href="#set-up-cross-validation" id="toc-set-up-cross-validation">Set
-    up cross validation</a>
-  - <a href="#linear-regression-models"
-    id="toc-linear-regression-models">Linear regression models</a>
-    - <a href="#lasso-model" id="toc-lasso-model">LASSO model</a>
-    - <a href="#forward-stepwise-model"
-      id="toc-forward-stepwise-model">Forward stepwise model</a>
-  - <a href="#tree-models" id="toc-tree-models">Tree models</a>
-    - <a href="#random-forest-model" id="toc-random-forest-model">Random
-      forest model</a>
-    - <a href="#boosted-tree-model" id="toc-boosted-tree-model">Boosted tree
-      model</a>
-- <a href="#comparison" id="toc-comparison">Comparison</a>
-  - <a href="#apply-model-for-prediction"
-    id="toc-apply-model-for-prediction">Apply model for prediction</a>
-  - <a href="#model-performance" id="toc-model-performance">Model
-    performance</a>
-    - <a href="#best-model-by-rmse-criteria"
-      id="toc-best-model-by-rmse-criteria">Best model by RMSE criteria</a>
-    - <a href="#best-model-by-rsquared-criteria"
-      id="toc-best-model-by-rsquared-criteria">Best model by Rsquared
-      criteria</a>
+-   [Introduction](#introduction)
+-   [Load packages](#load-packages)
+-   [Data](#data)
+    -   [Read in and subset data](#read-in-and-subset-data)
+    -   [Automation](#automation)
+    -   [Split data into train and
+        test](#split-data-into-train-and-test)
+-   [Summarization](#summarization)
+    -   [Numeric summaries](#numeric-summaries)
+    -   [Pairs plot](#pairs-plot)
+    -   [Barplot for weekday](#barplot-for-weekday)
+    -   [Boxplot of weekday vs shares](#boxplot-of-weekday-vs-shares)
+    -   [Scatterplot of title length & polarity vs
+        shares](#scatterplot-of-title-length--polarity-vs-shares)
+    -   [Scatterplots of negative & positive word rate vs
+        shares](#scatterplots-of-negative--positive-word-rate-vs-shares)
+-   [Modeling](#modeling)
+    -   [Set up cross validation](#set-up-cross-validation)
+    -   [Linear regression models](#linear-regression-models)
+        -   [LASSO model](#lasso-model)
+        -   [Forward stepwise model](#forward-stepwise-model)
+    -   [Ensemble models](#ensemble-models)
+        -   [Random forest model](#random-forest-model)
+        -   [Boosted tree model](#boosted-tree-model)
+-   [Comparison](#comparison)
+    -   [Apply model for prediction](#apply-model-for-prediction)
+    -   [Model performance](#model-performance)
+        -   [Best model by RMSE criteria](#best-model-by-rmse-criteria)
+        -   [Best model by Rsquared
+            criteria](#best-model-by-rsquared-criteria)
 
 # Introduction
 
@@ -431,7 +415,15 @@ fwdstep_model
     ##   RMSE      Rsquared     MAE     
     ##   8071.276  0.004286913  3351.775
 
-## Tree models
+## Ensemble models
+
+Ensemble modeling is a process where multiple diverse models are created
+to predict an outcome, either by using different modeling algorithms or
+using different training data sets. Each weak learner is fitted on the
+training set and provides predictions obtained. The final prediction
+result is computed by combining the results from all the weak learners.
+Thus, ensemble learning techniques have been proven to yield better
+performance on machine learning problems.
 
 ### Random forest model
 
@@ -489,36 +481,24 @@ gbm_model <- train(Shares ~ .,
                    trControl = control,
                    preProcess = c("center", "scale"),
                    verbose = FALSE)
-gbm_model
+gbm_model$bestTune
 ```
 
-    ## Stochastic Gradient Boosting 
-    ## 
-    ## 1472 samples
-    ##    8 predictor
-    ## 
-    ## Pre-processing: centered (13), scaled (13) 
-    ## Resampling: Cross-Validated (5 fold) 
-    ## Summary of sample sizes: 1176, 1178, 1177, 1177, 1180 
-    ## Resampling results across tuning parameters:
-    ## 
-    ##   interaction.depth  n.trees  RMSE      Rsquared     MAE     
-    ##   1                   50      8114.832  0.003245895  3365.566
-    ##   1                  100      8102.493  0.004796803  3366.177
-    ##   1                  150      8113.108  0.006096341  3370.063
-    ##   2                   50      8075.318  0.008932715  3341.457
-    ##   2                  100      8113.889  0.011477376  3367.361
-    ##   2                  150      8188.133  0.005888259  3421.047
-    ##   3                   50      8057.418  0.013821902  3381.761
-    ##   3                  100      8167.135  0.015418934  3478.222
-    ##   3                  150      8262.888  0.012656520  3580.348
-    ## 
-    ## Tuning parameter 'shrinkage' was held constant at a value of 0.1
-    ## 
-    ## Tuning parameter 'n.minobsinnode' was held constant at a value of 10
-    ## RMSE was used to select the optimal model using the smallest value.
-    ## The final values used for the model were n.trees = 50, interaction.depth =
-    ##  3, shrinkage = 0.1 and n.minobsinnode = 10.
+    ##   n.trees interaction.depth shrinkage n.minobsinnode
+    ## 7      50                 3       0.1             10
+
+``` r
+plot(gbm_model)
+```
+
+![](Project3_files/figure-gfm/gbm-1.png)<!-- -->
+
+As the output suggested, we can use the best tuning information to
+predict our interest. Shrinkage parameter lambda controls the rate at
+which boosting learns. The number of splits in each tree, which controls
+the complexity of the boosted ensemble (controlled with max.depth). We
+can also visual the relationship between number of iterations and RMSE
+under the cross validation.
 
 # Comparison
 
