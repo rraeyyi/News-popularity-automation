@@ -30,7 +30,7 @@ lapply(channel, report)
 ## Links to each report
 + The analysis for [Lifestyle](Lifestyle.md).
 + The analysis for [Entertainment](Entertainment.md).
-+ The analysis for [Bus](Bus.md).
++ The analysis for [Business](Business.md).
 + The analysis for [Socmed](Socmed.md).
 + The analysis for [Tech](Tech.md).
 + The analysis for [World](World.md).
