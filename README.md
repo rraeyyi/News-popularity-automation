@@ -1,4 +1,4 @@
-# ST 558 Project 3  
+# Project3  
 Rachel Hencher & Yi Ren
 
 ![](https://images.squarespace-cdn.com/content/v1/568f9ea70ab377cb54b16efb/067837d1-6426-457d-8872-76b54494fff1/news1-08746fa1.jpg?format=650w)
