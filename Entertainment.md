@@ -156,10 +156,10 @@ testing <- news_data[-intrain,]
 ## Numeric summaries
 
 The following table displays five-number summaries for each of the
-numeric variables explored. This allows us to identify what minimum,
-median, and maximum value for each of our variables, as well as the
-lower and upper quartiles. This can be useful information for
-understanding what our data looks like and how to scale our plots.
+numeric variables explored. This allows us to identify minimum, median,
+and maximum values for each of our variables, as well as the lower and
+upper quartiles. This can be useful information for understanding what
+our data looks like and how to scale our plots.
 
 ``` r
 stat <- training %>% 
@@ -213,9 +213,9 @@ ggpairs(training_sub)
 The following barplot displays counts for how many articles in a
 particular channel were published each day of the week over the time
 frame covered by the data set. A higher value on this plot would
-indicate that articles are shared more often on that particular day. It
-would be interesting to compare article shares on weekdays to weekends
-for a given channel.
+indicate that articles are published more often on that particular day.
+It could be interesting to compare the number of articles published on
+weekdays to weekends for a given channel.
 
 ``` r
 ggplot(training, aes(x = Weekday)) +
@@ -229,8 +229,8 @@ ggplot(training, aes(x = Weekday)) +
 
 The following boxplots display a five-number summary of shares for each
 day of the week. The axes are flipped, so if we wish to draw conclusions
-regarding which day may be best to maximize shares, we would look for a
-boxplot with a median furthest to the right.
+regarding which day may be best to maximize the number of shares, we
+would look for a boxplot with a median furthest to the right.
 
 ``` r
 ggplot(training, aes(x = Weekday, y = Shares)) +
@@ -244,11 +244,11 @@ ggplot(training, aes(x = Weekday, y = Shares)) +
 ## Scatterplot of title length & polarity vs shares
 
 The following scatterplot displays the number of shares for a given
-title length. The peak of the data, excluding outliers, indicates the
-title length that maximizes the number of shares. Additionally, the key
-displays the color coding for polarity of the title so that we can look
-for patterns to see whether the polarity of the title also has an effect
-on the number of shares.
+article title length. The peak of the data, excluding outliers,
+indicates the title length that maximizes the number of shares.
+Additionally, the key displays the color coding for polarity of the
+title so that we can look for patterns to see whether the polarity of
+the title also has an effect on the number of shares.
 
 ``` r
 ggplot(training, aes(x = Number_Title_Words, y = Shares)) + 
@@ -301,7 +301,7 @@ Throughout this section of the report we utilize two supervised learning
 methods, linear regression and tree models, in order to investigate our
 response, `Shares`. In supervised learning, we often wish to make
 inference on models or we may want to predict the response, which is
-what we will be doing in these next and final sections.
+what we will be doing in these next two sections.
 
 ## Set up cross validation
 
@@ -495,10 +495,10 @@ plot(gbm_model)
 
 As the output suggested, we can use the best tuning information to
 predict our interest. Shrinkage parameter lambda controls the rate at
-which boosting learns. The number of splits in each tree, which controls
-the complexity of the boosted ensemble (controlled with max.depth). We
-can also visual the relationship between number of iterations and RMSE
-under the cross validation.
+which boosting learns. The number of splits in each tree controls the
+complexity of the boosted ensemble (controlled with max.depth). We can
+also visual the relationship between number of iterations and RMSE under
+the cross validation.
 
 # Comparison
 

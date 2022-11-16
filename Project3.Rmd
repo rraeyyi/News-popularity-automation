@@ -89,7 +89,7 @@ testing <- news_data[-intrain,]
 
 # Summarization  
 ## Numeric summaries  
-The following table displays five-number summaries for each of the numeric variables explored. This allows us to identify what minimum, median, and maximum value for each of our variables, as well as the lower and upper quartiles. This can be useful information for understanding what our data looks like and how to scale our plots.  
+The following table displays five-number summaries for each of the numeric variables explored. This allows us to identify minimum, median, and maximum values for each of our variables, as well as the lower and upper quartiles. This can be useful information for understanding what our data looks like and how to scale our plots.  
 ```{r summary}
 stat <- training %>% 
   select(Number_Title_Words,
@@ -115,7 +115,7 @@ ggpairs(training_sub)
 ```
 
 ## Barplot for weekday  
-The following barplot displays counts for how many articles in a particular channel were published each day of the week over the time frame covered by the data set. A higher value on this plot would indicate that articles are shared more often on that particular day. It would be interesting to compare article shares on weekdays to weekends for a given channel.  
+The following barplot displays counts for how many articles in a particular channel were published each day of the week over the time frame covered by the data set. A higher value on this plot would indicate that articles are published more often on that particular day. It could be interesting to compare the number of articles published on weekdays to weekends for a given channel.  
 ```{r barplot}
 ggplot(training, aes(x = Weekday)) +
   geom_bar(fill = "medium blue", position = "dodge") +
@@ -123,7 +123,7 @@ ggplot(training, aes(x = Weekday)) +
 ```
 
 ## Boxplot of weekday vs shares  
-The following boxplots display a five-number summary of shares for each day of the week. The axes are flipped, so if we wish to draw conclusions regarding which day may be best to maximize shares, we would look for a boxplot with a median furthest to the right.
+The following boxplots display a five-number summary of shares for each day of the week. The axes are flipped, so if we wish to draw conclusions regarding which day may be best to maximize the number of shares, we would look for a boxplot with a median furthest to the right.
 ```{r boxplot}
 ggplot(training, aes(x = Weekday, y = Shares)) +
   geom_boxplot(color = "royal blue") +
@@ -132,7 +132,7 @@ ggplot(training, aes(x = Weekday, y = Shares)) +
 ```
 
 ## Scatterplot of title length & polarity vs shares  
-The following scatterplot displays the number of shares for a given title length. The peak of the data, excluding outliers, indicates the title length that maximizes the number of shares. Additionally, the key displays the color coding for polarity of the title so that we can look for patterns to see whether the polarity of the title also has an effect on the number of shares.
+The following scatterplot displays the number of shares for a given article title length. The peak of the data, excluding outliers, indicates the title length that maximizes the number of shares. Additionally, the key displays the color coding for polarity of the title so that we can look for patterns to see whether the polarity of the title also has an effect on the number of shares.
 ```{r scatterplot}
 ggplot(training, aes(x = Number_Title_Words, y = Shares)) + 
   geom_point(aes(color = Title_Polarity))
@@ -153,7 +153,7 @@ ggplot(training, aes(x = Negative_Word_Rate, y = Shares)) +
 ```
 
 # Modeling  
-Throughout this section of the report we utilize two supervised learning methods, linear regression and tree models, in order to investigate our response, `Shares`. In supervised learning, we often wish to make inference on models or we may want to predict the response, which is what we will be doing in these next and final sections.    
+Throughout this section of the report we utilize two supervised learning methods, linear regression and tree models, in order to investigate our response, `Shares`. In supervised learning, we often wish to make inference on models or we may want to predict the response, which is what we will be doing in these next two sections.    
 
 ## Set up cross validation  
 The below sets up the cross-validation for our models. All models will also utilize the `preProcess` argument in order to standardize the data.
@@ -215,7 +215,7 @@ gbm_model$bestTune
 plot(gbm_model)
 ```
 
-As the output suggested, we can use the best tuning information to predict our interest. Shrinkage parameter lambda controls the rate at which boosting learns. The number of splits in each tree, which controls the complexity of the boosted ensemble (controlled with max.depth). We can also visual the relationship between number of iterations and RMSE under the cross validation. 
+As the output suggested, we can use the best tuning information to predict our interest. Shrinkage parameter lambda controls the rate at which boosting learns. The number of splits in each tree controls the complexity of the boosted ensemble (controlled with max.depth). We can also visual the relationship between number of iterations and RMSE under the cross validation. 
 
 # Comparison
 ## Apply model for prediction  
