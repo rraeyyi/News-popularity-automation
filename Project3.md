@@ -1,7 +1,7 @@
-Bus Analysis
+Lifestyle Analysis
 ================
 Rachel Hencher and Yi Ren
-2022-11-14
+2022-11-15
 
 - <a href="#introduction" id="toc-introduction">Introduction</a>
 - <a href="#load-packages" id="toc-load-packages">Load packages</a>
@@ -119,14 +119,17 @@ news$Weekday <- as.factor(ifelse(news$weekday_is_monday == 1, "Monday",
 
 news$Channel <- as.factor(ifelse(news$data_channel_is_lifestyle == 1, "Lifestyle",
                                  ifelse(news$data_channel_is_entertainment == 1, "Entertainment", 
-                                        ifelse(news$data_channel_is_bus == 1, "Bus", 
-                                               ifelse(news$data_channel_is_socmed , "Socmed",
-                                                      ifelse(news$data_channel_is_tech == 1, "Tech", "World"))))))
+                                        ifelse(news$data_channel_is_bus == 1, "Business", 
+                                               ifelse(news$data_channel_is_socmed , "SocialMedia",
+                                                      ifelse(news$data_channel_is_tech == 1, "Technology", "World"))))))
 news_final <- news %>%
   select(-c(starts_with("weekday_is"), starts_with("data_channel_is")))
 ```
 
 ## Automation
+
+The code below takes the `Channel` variable and filters our data set so
+that we may solely explore the data for the designated channel.
 
 ``` r
 news_data <- news_final %>% 
@@ -156,7 +159,10 @@ testing <- news_data[-intrain,]
 ## Numeric summaries
 
 The following table displays five-number summaries for each of the
-numeric variables explored.
+numeric variables explored. This allows us to identify minimum, median,
+and maximum values for each of our variables, as well as the lower and
+upper quartiles. This can be useful information for understanding what
+our data looks like and how to scale our plots.
 
 ``` r
 stat <- training %>% 
@@ -175,12 +181,12 @@ kable(stat, caption = "Summary Stats for Numeric Variables", digits = 2)
 
 |         | Number_Title_Words | Number_Content_Words | Number_Images | Number_Videos | Positive_Word_Rate | Negative_Word_Rate | Title_Polarity |    Shares |
 |:--------|-------------------:|---------------------:|--------------:|--------------:|-------------------:|-------------------:|---------------:|----------:|
-| Min.    |                3.0 |                 0.00 |          0.00 |          0.00 |               0.00 |               0.00 |          -1.00 |      1.00 |
-| 1st Qu. |                9.0 |               245.00 |          1.00 |          0.00 |               0.03 |               0.01 |           0.00 |    952.25 |
-| Median  |               10.0 |               397.00 |          1.00 |          0.00 |               0.04 |               0.01 |           0.00 |   1400.00 |
-| Mean    |               10.3 |               535.09 |          1.82 |          0.65 |               0.04 |               0.01 |           0.08 |   3120.02 |
-| 3rd Qu. |               12.0 |               719.75 |          1.00 |          0.00 |               0.05 |               0.02 |           0.14 |   2500.00 |
-| Max.    |               19.0 |              4894.00 |         51.00 |         75.00 |               0.11 |               0.06 |           1.00 | 690400.00 |
+| Min.    |               3.00 |                 0.00 |          0.00 |          0.00 |               0.00 |               0.00 |          -1.00 |     28.00 |
+| 1st Qu. |               8.00 |               298.75 |          1.00 |          0.00 |               0.03 |               0.01 |           0.00 |   1100.00 |
+| Median  |              10.00 |               498.00 |          1.00 |          0.00 |               0.04 |               0.02 |           0.00 |   1700.00 |
+| Mean    |               9.76 |               622.35 |          4.67 |          0.48 |               0.04 |               0.02 |           0.11 |   3687.17 |
+| 3rd Qu. |              11.00 |               793.00 |          8.00 |          0.00 |               0.05 |               0.02 |           0.21 |   3225.00 |
+| Max.    |              18.00 |              8474.00 |        111.00 |         50.00 |               0.12 |               0.06 |           1.00 | 196700.00 |
 
 Summary Stats for Numeric Variables
 
@@ -209,12 +215,15 @@ ggpairs(training_sub)
 
 The following barplot displays counts for how many articles in a
 particular channel were published each day of the week over the time
-frame covered by the data set.
+frame covered by the data set. A higher value on this plot would
+indicate that articles are published more often on that particular day.
+It could be interesting to compare the number of articles published on
+weekdays to weekends for a given channel.
 
 ``` r
 ggplot(training, aes(x = Weekday)) +
   geom_bar(fill = "medium blue", position = "dodge") +
-  labs(y = "Count")
+  labs(title = "Number of Articles Published for Each Day of the Week", y = "Count")
 ```
 
 ![](Project3_files/figure-gfm/barplot-1.png)<!-- -->
@@ -223,14 +232,15 @@ ggplot(training, aes(x = Weekday)) +
 
 The following boxplots display a five-number summary of shares for each
 day of the week. The axes are flipped, so if we wish to draw conclusions
-regarding which day may be best to maximize shares, we would look for a
-boxplot with a median furthest to the right.
+regarding which day may be best to maximize the number of shares, we
+would look for a boxplot with a median furthest to the right.
 
 ``` r
 ggplot(training, aes(x = Weekday, y = Shares)) +
   geom_boxplot(color = "royal blue") +
   coord_flip() +
-  scale_y_continuous(trans = "log10")
+  scale_y_continuous(trans = "log10") +
+  labs(title = "Number of Shares for Each Day of the Week")
 ```
 
 ![](Project3_files/figure-gfm/boxplot-1.png)<!-- -->
@@ -238,15 +248,16 @@ ggplot(training, aes(x = Weekday, y = Shares)) +
 ## Scatterplot of title length & polarity vs shares
 
 The following scatterplot displays the number of shares for a given
-title length. The peak of the data, excluding outliers, indicates the
-title length that maximizes the number of shares. Additionally, the key
-displays the color coding for polarity of the title so that we can look
-for patterns to see whether the polarity of the title also has an effect
-on the number of shares.
+article title length. The peak of the data, excluding outliers,
+indicates the title length that maximizes the number of shares.
+Additionally, the key displays the color coding for polarity of the
+title so that we can look for patterns to see whether the polarity of
+the title also has an effect on the number of shares.
 
 ``` r
 ggplot(training, aes(x = Number_Title_Words, y = Shares)) + 
-  geom_point(aes(color = Title_Polarity))
+  geom_point(aes(color = Title_Polarity)) +
+  labs(title = "Number of Shares vs Number of Words in the Article Title", x = "Number of Words in the Title")
 ```
 
 ![](Project3_files/figure-gfm/scatterplot-1.png)<!-- -->
@@ -271,12 +282,9 @@ closer to 0 would indicate little to no correlation.
 ggplot(training, aes(x = Positive_Word_Rate, y = Shares)) + 
   geom_point(size = 0.7, color = "royal blue") + 
   stat_cor(method = "pearson", label.x = 0, label.y = 100000, color = "royal blue") +
-  xlim(0, 0.125) + ylim(0, 250000)
+  xlim(0, 0.125) + ylim(0, 250000) +
+  labs(title = "Number of Shares vs Article Positive Word Rate", x = "Positive Word Rate")
 ```
-
-    ## Warning: Removed 4 rows containing non-finite values (stat_cor).
-
-    ## Warning: Removed 4 rows containing missing values (geom_point).
 
 ![](Project3_files/figure-gfm/scatterplot2-1.png)<!-- -->
 
@@ -284,11 +292,9 @@ ggplot(training, aes(x = Positive_Word_Rate, y = Shares)) +
 ggplot(training, aes(x = Negative_Word_Rate, y = Shares)) + 
   geom_point(size = 0.7, color = "dark blue") + 
   stat_cor(method = "pearson", label.x = 0, label.y = 100000, color = "dark blue") +
-  xlim(0, 0.125) + ylim(0, 250000)
+  xlim(0, 0.125) + ylim(0, 250000) +
+  labs(title = "Number of Shares vs Article Negative Word Rate", x = "Negative Word Rate")
 ```
-
-    ## Warning: Removed 4 rows containing non-finite values (stat_cor).
-    ## Removed 4 rows containing missing values (geom_point).
 
 ![](Project3_files/figure-gfm/scatterplot2-2.png)<!-- -->
 
@@ -297,8 +303,8 @@ ggplot(training, aes(x = Negative_Word_Rate, y = Shares)) +
 Throughout this section of the report we utilize two supervised learning
 methods, linear regression and tree models, in order to investigate our
 response, `Shares`. In supervised learning, we often wish to make
-inference on the model or may want to predict the response, which is
-what we will be doing in the next and final section.
+inference on models or we may want to predict the response, which is
+what we will be doing in these next two sections.
 
 ## Set up cross validation
 
@@ -311,8 +317,13 @@ control <- trainControl(method = "cv", number = 5)
 
 ## Linear regression models
 
-In linear regression, we generate a model where we fit betas by
-minimizing the sum of the squared residuals. Three of the most common
+Linear regression models make sense to explore in this scenario because
+they describe relationships between predictor and response variables,
+which is precisely what our goal is. In linear regression, we generate a
+model where we fit betas, our intercept and slope(s), by minimizing the
+sum of the squared residuals. However, in situations such as this where
+there are many predictors, we do not typically include all predictors in
+the model in order to prevent overfitting. Three of the most common
 variable selection techniques for linear regression are: hypothesis
 testing based methods (forward stepwise, backward stepwise, best subset
 selection), penalization based methods (LASSO, Elastic Net, SCAD), and
@@ -333,85 +344,77 @@ predict(lasso_model$finalModel, type = "coef")
 ```
 
     ## $s
-    ##  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
+    ##  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14
     ## 
     ## $fraction
-    ##  [1] 0.00000000 0.06666667 0.13333333 0.20000000 0.26666667 0.33333333
-    ##  [7] 0.40000000 0.46666667 0.53333333 0.60000000 0.66666667 0.73333333
-    ## [13] 0.80000000 0.86666667 0.93333333 1.00000000
+    ##  [1] 0.00000000 0.07692308 0.15384615 0.23076923 0.30769231 0.38461538
+    ##  [7] 0.46153846 0.53846154 0.61538462 0.69230769 0.76923077 0.84615385
+    ## [13] 0.92307692 1.00000000
     ## 
     ## $mode
     ## [1] "step"
     ## 
     ## $coefficients
     ##    Number_Title_Words Number_Content_Words Number_Images Number_Videos
-    ## 0             0.00000              0.00000      0.000000        0.0000
-    ## 1             0.00000              0.00000      0.000000      387.9822
-    ## 2             0.00000              0.00000      0.000000      409.8800
-    ## 3             0.00000              0.00000      0.000000      632.0283
-    ## 4             0.00000              0.00000      0.000000      726.1728
-    ## 5            33.92928              0.00000      0.000000      758.8212
-    ## 6            39.21171              0.00000      5.552683      763.8985
-    ## 7            42.59554              0.00000      9.021824      767.1708
-    ## 8            89.19633              0.00000     55.812700      811.5036
-    ## 9           132.55068              0.00000     97.964742      852.0951
-    ## 10          136.59762              0.00000    101.936656      855.5340
-    ## 11          168.18682              0.00000    131.027773      881.8785
-    ## 12          183.01596            -31.50782    152.177643      898.0972
-    ## 13          186.50299            -38.62089    156.986007      902.0127
-    ## 14          210.20609            -86.76419    188.741824      927.4245
-    ## 15          225.42578           -118.01800    210.657655      945.7183
+    ## 0             0.00000               0.0000      0.000000        0.0000
+    ## 1             0.00000               0.0000      0.000000      138.5328
+    ## 2             0.00000             308.2257      0.000000      446.7585
+    ## 3             0.00000             490.5038      0.000000      618.3755
+    ## 4             0.00000             547.7259      0.000000      674.4402
+    ## 5             0.00000             560.1326      0.000000      687.1379
+    ## 6             0.00000             564.4714      0.000000      691.4326
+    ## 7             0.00000             584.4576      0.000000      711.4725
+    ## 8           -63.54108             642.9014      0.000000      769.9609
+    ## 9           -76.29415             653.8666      0.000000      782.2253
+    ## 10          -76.97130             654.4843      0.000000      782.8756
+    ## 11          -92.05088             668.5817      0.000000      796.8285
+    ## 12          -95.23637             674.4743     -6.645061      798.9564
+    ## 13         -120.22250             715.3273    -58.164322      812.5976
     ##    Positive_Word_Rate Negative_Word_Rate Title_Polarity WeekdayMonday
-    ## 0            0.000000             0.0000        0.00000       0.00000
-    ## 1            0.000000             0.0000        0.00000       0.00000
-    ## 2            0.000000             0.0000        0.00000      21.89784
-    ## 3            0.000000           226.7260        0.00000     249.71789
-    ## 4            0.000000           318.1634        0.00000     355.40503
-    ## 5            0.000000           350.2376        0.00000     394.15569
-    ## 6            0.000000           355.1906        0.00000     400.07247
-    ## 7            0.000000           358.2767        0.00000     404.35968
-    ## 8            0.000000           400.2355        0.00000     456.87901
-    ## 9            0.000000           438.8161        0.00000     532.34250
-    ## 10           3.339763           442.4854        0.00000     539.29198
-    ## 11          33.376564           466.1981      -36.75636     590.73550
-    ## 12          52.444905           480.0839      -53.90003     615.88278
-    ## 13          56.483988           483.3037      -57.73558     629.78668
-    ## 14          84.023681           504.5589      -84.05560     688.85192
-    ## 15         101.568821           519.2430     -100.54848     784.98397
+    ## 0             0.00000            0.00000       0.000000        0.0000
+    ## 1             0.00000            0.00000       0.000000        0.0000
+    ## 2             0.00000            0.00000       0.000000        0.0000
+    ## 3             0.00000            0.00000       0.000000      180.5782
+    ## 4             0.00000           59.67134       0.000000      239.6589
+    ## 5             0.00000           73.20568       0.000000      255.1374
+    ## 6             0.00000           77.11953      -4.488534      260.2012
+    ## 7             0.00000           96.07728     -28.125811      288.7892
+    ## 8             0.00000          152.44431     -96.006716      372.6313
+    ## 9            11.05990          163.42588    -111.665319      389.8758
+    ## 10           11.64972          164.00271    -112.471441      391.1050
+    ## 11           24.59157          174.97297    -130.067141      429.8247
+    ## 12           27.10524          176.73272    -132.882278      437.1123
+    ## 13           46.23105          190.11502    -151.339412      556.8847
     ##    WeekdaySaturday WeekdaySunday WeekdayThursday WeekdayTuesday
-    ## 0           0.0000      0.000000         0.00000        0.00000
-    ## 1           0.0000      0.000000         0.00000        0.00000
-    ## 2           0.0000      0.000000         0.00000        0.00000
-    ## 3           0.0000      0.000000         0.00000        0.00000
-    ## 4         105.6369      0.000000         0.00000        0.00000
-    ## 5         144.6571      0.000000         0.00000        0.00000
-    ## 6         150.5393      0.000000         0.00000        0.00000
-    ## 7         154.5583      4.105292         0.00000        0.00000
-    ## 8         206.4173     56.490815         0.00000        0.00000
-    ## 9         267.7628    121.213581         0.00000       76.32046
-    ## 10        273.2862    126.970170         0.00000       83.48471
-    ## 11        313.2238    170.200669         0.00000      136.34272
-    ## 12        334.9433    194.626731         0.00000      160.15916
-    ## 13        344.0090    205.182321        14.04234      173.92006
-    ## 14        387.6987    255.228889        72.42110      231.31171
-    ## 15        445.2015    323.005343       170.78494      327.52117
+    ## 0          0.00000       0.00000        0.000000        0.00000
+    ## 1          0.00000       0.00000        0.000000        0.00000
+    ## 2          0.00000       0.00000        0.000000        0.00000
+    ## 3          0.00000       0.00000        0.000000        0.00000
+    ## 4          0.00000       0.00000        0.000000        0.00000
+    ## 5          0.00000      15.76728        0.000000        0.00000
+    ## 6          0.00000      21.25706        0.000000        0.00000
+    ## 7         28.99886      51.44346        0.000000        0.00000
+    ## 8        112.01359     137.34380        0.000000        0.00000
+    ## 9        129.09151     154.62991        0.000000        0.00000
+    ## 10       130.23795     155.81450        1.258177        0.00000
+    ## 11       164.35894     191.80560       41.174412       39.32642
+    ## 12       171.66419     199.54596       48.542938       46.63928
+    ## 13       276.41809     313.27092      171.675889      166.54379
     ##    WeekdayWednesday
-    ## 0          0.000000
-    ## 1          0.000000
-    ## 2          0.000000
-    ## 3          0.000000
-    ## 4          0.000000
-    ## 5          0.000000
-    ## 6          0.000000
-    ## 7          0.000000
-    ## 8        -22.657843
-    ## 9        -15.751944
-    ## 10       -15.063997
-    ## 11       -10.548741
-    ## 12        -8.761266
-    ## 13         0.000000
-    ## 14         0.000000
-    ## 15        97.794512
+    ## 0            0.0000
+    ## 1            0.0000
+    ## 2            0.0000
+    ## 3            0.0000
+    ## 4            0.0000
+    ## 5            0.0000
+    ## 6            0.0000
+    ## 7            0.0000
+    ## 8            0.0000
+    ## 9            0.0000
+    ## 10           0.0000
+    ## 11           0.0000
+    ## 12           0.0000
+    ## 13         131.9782
 
 ``` r
 lasso_model$bestTune
@@ -435,16 +438,16 @@ fwdstep_model
 
     ## Generalized Linear Model with Stepwise Feature Selection 
     ## 
-    ## 4382 samples
+    ## 1472 samples
     ##    8 predictor
     ## 
     ## Pre-processing: centered (13), scaled (13) 
     ## Resampling: Cross-Validated (5 fold) 
-    ## Summary of sample sizes: 3505, 3506, 3506, 3505, 3506 
+    ## Summary of sample sizes: 1177, 1177, 1178, 1178, 1178 
     ## Resampling results:
     ## 
     ##   RMSE      Rsquared     MAE     
-    ##   14413.34  0.006930718  2864.648
+    ##   8071.276  0.004286913  3351.775
 
 ## Ensemble models
 
@@ -481,17 +484,17 @@ rf_model
 
     ## Random Forest 
     ## 
-    ## 4382 samples
+    ## 1472 samples
     ##    8 predictor
     ## 
     ## Pre-processing: centered (13), scaled (13) 
     ## Resampling: Cross-Validated (5 fold) 
-    ## Summary of sample sizes: 3506, 3506, 3506, 3505, 3505 
+    ## Summary of sample sizes: 1177, 1177, 1179, 1177, 1178 
     ## Resampling results across tuning parameters:
     ## 
-    ##   mtry  RMSE      Rsquared    MAE     
-    ##   1     14337.31  0.01673479  2795.908
-    ##   2     14631.00  0.01290402  2868.021
+    ##   mtry  RMSE      Rsquared     MAE     
+    ##   1     7609.380  0.006580823  3297.881
+    ##   2     7720.388  0.009112575  3333.962
     ## 
     ## RMSE was used to select the optimal model using the smallest value.
     ## The final value used for the model was mtry = 1.
@@ -516,7 +519,7 @@ gbm_model$bestTune
 ```
 
     ##   n.trees interaction.depth shrinkage n.minobsinnode
-    ## 1      50                 1       0.1             10
+    ## 7      50                 3       0.1             10
 
 ``` r
 plot(gbm_model)
@@ -526,9 +529,9 @@ plot(gbm_model)
 
 As the output suggested, we can use the best tuning information to
 predict our interest. Shrinkage parameter lambda controls the rate at
-which boosting learns. The number of splits in each tree, which controls
-the complexity of the boosted ensemble (controlled with max.depth). We
-can also visual the relationship between number of iterations and RMSE
+which boosting learns. The number of splits in each tree controls the
+complexity of the boosted ensemble (controlled with max. depth). We can
+also visualize the relationship between number of iterations and RMSE
 under the cross validation.
 
 # Comparison
@@ -563,11 +566,11 @@ performance_table <- cbind(Model, table)
 performance_table
 ```
 
-    ##              Model     RMSE     Rsquared      MAE
-    ## 1            Lasso 10068.70 0.0003798429 2656.104
-    ## 2 Forward_Stepwise 10110.00 0.0005097813 2717.107
-    ## 3    Random_Forest 10060.12 0.0056711150 2645.669
-    ## 4     Boosted_Tree 10128.78 0.0038489997 2730.695
+    ##              Model     RMSE    Rsquared      MAE
+    ## 1            Lasso 9650.057 0.005337779 3285.077
+    ## 2 Forward_Stepwise 9646.664 0.004534141 3246.652
+    ## 3    Random_Forest 9642.975 0.004398112 3189.987
+    ## 4     Boosted_Tree 9746.785 0.002727183 3265.054
 
 ### Best model by RMSE criteria
 
@@ -576,7 +579,7 @@ performance_table %>% slice_min(RMSE)
 ```
 
     ##           Model     RMSE    Rsquared      MAE
-    ## 1 Random_Forest 10060.12 0.005671115 2645.669
+    ## 1 Random_Forest 9642.975 0.004398112 3189.987
 
 ### Best model by Rsquared criteria
 
@@ -584,5 +587,5 @@ performance_table %>% slice_min(RMSE)
 performance_table %>% slice_max(Rsquared)
 ```
 
-    ##           Model     RMSE    Rsquared      MAE
-    ## 1 Random_Forest 10060.12 0.005671115 2645.669
+    ##   Model     RMSE    Rsquared      MAE
+    ## 1 Lasso 9650.057 0.005337779 3285.077

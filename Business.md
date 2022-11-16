@@ -128,6 +128,9 @@ news_final <- news %>%
 
 ## Automation
 
+The code below takes the `Channel` variable and filters our data set so
+that we may solely explore the data for the designated channel.
+
 ``` r
 news_data <- news_final %>% 
   filter(news_final$Channel == params$channel) %>% 
@@ -220,7 +223,7 @@ weekdays to weekends for a given channel.
 ``` r
 ggplot(training, aes(x = Weekday)) +
   geom_bar(fill = "medium blue", position = "dodge") +
-  labs(y = "Count")
+  labs(title = "Number of Articles Published for Each Day of the Week", y = "Count")
 ```
 
 ![](Business_files/figure-gfm/barplot-1.png)<!-- -->
@@ -236,7 +239,8 @@ would look for a boxplot with a median furthest to the right.
 ggplot(training, aes(x = Weekday, y = Shares)) +
   geom_boxplot(color = "royal blue") +
   coord_flip() +
-  scale_y_continuous(trans = "log10")
+  scale_y_continuous(trans = "log10") +
+  labs(title = "Number of Shares for Each Day of the Week")
 ```
 
 ![](Business_files/figure-gfm/boxplot-1.png)<!-- -->
@@ -252,7 +256,8 @@ the title also has an effect on the number of shares.
 
 ``` r
 ggplot(training, aes(x = Number_Title_Words, y = Shares)) + 
-  geom_point(aes(color = Title_Polarity))
+  geom_point(aes(color = Title_Polarity)) +
+  labs(title = "Number of Shares vs Number of Words in the Article Title", x = "Number of Words in the Title")
 ```
 
 ![](Business_files/figure-gfm/scatterplot-1.png)<!-- -->
@@ -277,7 +282,8 @@ closer to 0 would indicate little to no correlation.
 ggplot(training, aes(x = Positive_Word_Rate, y = Shares)) + 
   geom_point(size = 0.7, color = "royal blue") + 
   stat_cor(method = "pearson", label.x = 0, label.y = 100000, color = "royal blue") +
-  xlim(0, 0.125) + ylim(0, 250000)
+  xlim(0, 0.125) + ylim(0, 250000) +
+  labs(title = "Number of Shares vs Article Positive Word Rate", x = "Positive Word Rate")
 ```
 
     ## Warning: Removed 4 rows containing non-finite values (stat_cor).
@@ -290,7 +296,8 @@ ggplot(training, aes(x = Positive_Word_Rate, y = Shares)) +
 ggplot(training, aes(x = Negative_Word_Rate, y = Shares)) + 
   geom_point(size = 0.7, color = "dark blue") + 
   stat_cor(method = "pearson", label.x = 0, label.y = 100000, color = "dark blue") +
-  xlim(0, 0.125) + ylim(0, 250000)
+  xlim(0, 0.125) + ylim(0, 250000) +
+  labs(title = "Number of Shares vs Article Negative Word Rate", x = "Negative Word Rate")
 ```
 
     ## Warning: Removed 4 rows containing non-finite values (stat_cor).
@@ -503,9 +510,9 @@ plot(gbm_model)
 As the output suggested, we can use the best tuning information to
 predict our interest. Shrinkage parameter lambda controls the rate at
 which boosting learns. The number of splits in each tree controls the
-complexity of the boosted ensemble (controlled with max.depth). We can
-also visual the relationship between number of iterations and RMSE under
-the cross validation.
+complexity of the boosted ensemble (controlled with max. depth). We can
+also visualize the relationship between number of iterations and RMSE
+under the cross validation.
 
 # Comparison
 
