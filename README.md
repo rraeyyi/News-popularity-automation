@@ -19,7 +19,7 @@ library(rmarkdown)
 
 ## Automation for reports
 ```{r}
-channel <- c("Lifestyle", "Entertainment", "Bus", "Socmed", "Tech", "World")
+channel <- c("Lifestyle", "Entertainment", "Business", "SocialMedia", "Technology", "World")
 report <- function(channel){
   render("Project3.Rmd", 
          params = list(channel = channel), 

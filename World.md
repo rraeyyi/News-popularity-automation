@@ -119,9 +119,9 @@ news$Weekday <- as.factor(ifelse(news$weekday_is_monday == 1, "Monday",
 
 news$Channel <- as.factor(ifelse(news$data_channel_is_lifestyle == 1, "Lifestyle",
                                  ifelse(news$data_channel_is_entertainment == 1, "Entertainment", 
-                                        ifelse(news$data_channel_is_bus == 1, "Bus", 
-                                               ifelse(news$data_channel_is_socmed , "Socmed",
-                                                      ifelse(news$data_channel_is_tech == 1, "Tech", "World"))))))
+                                        ifelse(news$data_channel_is_bus == 1, "Business", 
+                                               ifelse(news$data_channel_is_socmed , "SocialMedia",
+                                                      ifelse(news$data_channel_is_tech == 1, "Technology", "World"))))))
 news_final <- news %>%
   select(-c(starts_with("weekday_is"), starts_with("data_channel_is")))
 ```

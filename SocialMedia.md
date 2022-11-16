@@ -1,4 +1,4 @@
-Lifestyle Analysis
+SocialMedia Analysis
 ================
 Rachel Hencher and Yi Ren
 2022-11-15
@@ -178,12 +178,12 @@ kable(stat, caption = "Summary Stats for Numeric Variables", digits = 2)
 
 |         | Number_Title_Words | Number_Content_Words | Number_Images | Number_Videos | Positive_Word_Rate | Negative_Word_Rate | Title_Polarity |    Shares |
 |:--------|-------------------:|---------------------:|--------------:|--------------:|-------------------:|-------------------:|---------------:|----------:|
-| Min.    |               3.00 |                 0.00 |          0.00 |          0.00 |               0.00 |               0.00 |          -1.00 |     28.00 |
-| 1st Qu. |               8.00 |               298.75 |          1.00 |          0.00 |               0.03 |               0.01 |           0.00 |   1100.00 |
-| Median  |              10.00 |               498.00 |          1.00 |          0.00 |               0.04 |               0.02 |           0.00 |   1700.00 |
-| Mean    |               9.76 |               622.35 |          4.67 |          0.48 |               0.04 |               0.02 |           0.11 |   3687.17 |
-| 3rd Qu. |              11.00 |               793.00 |          8.00 |          0.00 |               0.05 |               0.02 |           0.21 |   3225.00 |
-| Max.    |              18.00 |              8474.00 |        111.00 |         50.00 |               0.12 |               0.06 |           1.00 | 196700.00 |
+| Min.    |               4.00 |                 0.00 |          0.00 |          0.00 |               0.00 |               0.00 |          -1.00 |      5.00 |
+| 1st Qu. |               8.00 |               251.75 |          1.00 |          0.00 |               0.04 |               0.01 |           0.00 |   1400.00 |
+| Median  |               9.00 |               425.00 |          1.00 |          0.00 |               0.05 |               0.01 |           0.00 |   2100.00 |
+| Mean    |               9.59 |               597.09 |          4.14 |          1.07 |               0.05 |               0.02 |           0.09 |   3731.41 |
+| 3rd Qu. |              11.00 |               747.50 |          3.00 |          1.00 |               0.06 |               0.02 |           0.14 |   3800.00 |
+| Max.    |              18.00 |              4451.00 |         61.00 |         48.00 |               0.16 |               0.14 |           1.00 | 122800.00 |
 
 Summary Stats for Numeric Variables
 
@@ -206,7 +206,7 @@ training_sub <- training %>%
 ggpairs(training_sub)
 ```
 
-![](Lifestyle_files/figure-gfm/ggpairs-1.png)<!-- -->
+![](SocialMedia_files/figure-gfm/ggpairs-1.png)<!-- -->
 
 ## Barplot for weekday
 
@@ -223,7 +223,7 @@ ggplot(training, aes(x = Weekday)) +
   labs(y = "Count")
 ```
 
-![](Lifestyle_files/figure-gfm/barplot-1.png)<!-- -->
+![](SocialMedia_files/figure-gfm/barplot-1.png)<!-- -->
 
 ## Boxplot of weekday vs shares
 
@@ -239,7 +239,7 @@ ggplot(training, aes(x = Weekday, y = Shares)) +
   scale_y_continuous(trans = "log10")
 ```
 
-![](Lifestyle_files/figure-gfm/boxplot-1.png)<!-- -->
+![](SocialMedia_files/figure-gfm/boxplot-1.png)<!-- -->
 
 ## Scatterplot of title length & polarity vs shares
 
@@ -255,7 +255,7 @@ ggplot(training, aes(x = Number_Title_Words, y = Shares)) +
   geom_point(aes(color = Title_Polarity))
 ```
 
-![](Lifestyle_files/figure-gfm/scatterplot-1.png)<!-- -->
+![](SocialMedia_files/figure-gfm/scatterplot-1.png)<!-- -->
 
 ## Scatterplots of negative & positive word rate vs shares
 
@@ -280,7 +280,11 @@ ggplot(training, aes(x = Positive_Word_Rate, y = Shares)) +
   xlim(0, 0.125) + ylim(0, 250000)
 ```
 
-![](Lifestyle_files/figure-gfm/scatterplot2-1.png)<!-- -->
+    ## Warning: Removed 2 rows containing non-finite values (stat_cor).
+
+    ## Warning: Removed 2 rows containing missing values (geom_point).
+
+![](SocialMedia_files/figure-gfm/scatterplot2-1.png)<!-- -->
 
 ``` r
 ggplot(training, aes(x = Negative_Word_Rate, y = Shares)) + 
@@ -289,7 +293,11 @@ ggplot(training, aes(x = Negative_Word_Rate, y = Shares)) +
   xlim(0, 0.125) + ylim(0, 250000)
 ```
 
-![](Lifestyle_files/figure-gfm/scatterplot2-2.png)<!-- -->
+    ## Warning: Removed 1 rows containing non-finite values (stat_cor).
+
+    ## Warning: Removed 1 rows containing missing values (geom_point).
+
+![](SocialMedia_files/figure-gfm/scatterplot2-2.png)<!-- -->
 
 # Modeling
 
@@ -337,53 +345,57 @@ predict(lasso_model$finalModel, type = "coef")
 ```
 
     ## $s
-    ##  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14
+    ##  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
     ## 
     ## $fraction
-    ##  [1] 0.00000000 0.07692308 0.15384615 0.23076923 0.30769231 0.38461538 0.46153846 0.53846154 0.61538462 0.69230769 0.76923077 0.84615385
-    ## [13] 0.92307692 1.00000000
+    ##  [1] 0.00000000 0.06666667 0.13333333 0.20000000 0.26666667 0.33333333 0.40000000 0.46666667 0.53333333 0.60000000 0.66666667 0.73333333
+    ## [13] 0.80000000 0.86666667 0.93333333 1.00000000
     ## 
     ## $mode
     ## [1] "step"
     ## 
     ## $coefficients
     ##    Number_Title_Words Number_Content_Words Number_Images Number_Videos Positive_Word_Rate Negative_Word_Rate Title_Polarity WeekdayMonday
-    ## 0             0.00000               0.0000      0.000000        0.0000            0.00000            0.00000       0.000000        0.0000
-    ## 1             0.00000               0.0000      0.000000      138.5328            0.00000            0.00000       0.000000        0.0000
-    ## 2             0.00000             308.2257      0.000000      446.7585            0.00000            0.00000       0.000000        0.0000
-    ## 3             0.00000             490.5038      0.000000      618.3755            0.00000            0.00000       0.000000      180.5782
-    ## 4             0.00000             547.7259      0.000000      674.4402            0.00000           59.67134       0.000000      239.6589
-    ## 5             0.00000             560.1326      0.000000      687.1379            0.00000           73.20568       0.000000      255.1374
-    ## 6             0.00000             564.4714      0.000000      691.4326            0.00000           77.11953      -4.488534      260.2012
-    ## 7             0.00000             584.4576      0.000000      711.4725            0.00000           96.07728     -28.125811      288.7892
-    ## 8           -63.54108             642.9014      0.000000      769.9609            0.00000          152.44431     -96.006716      372.6313
-    ## 9           -76.29415             653.8666      0.000000      782.2253           11.05990          163.42588    -111.665319      389.8758
-    ## 10          -76.97130             654.4843      0.000000      782.8756           11.64972          164.00271    -112.471441      391.1050
-    ## 11          -92.05088             668.5817      0.000000      796.8285           24.59157          174.97297    -130.067141      429.8247
-    ## 12          -95.23637             674.4743     -6.645061      798.9564           27.10524          176.73272    -132.882278      437.1123
-    ## 13         -120.22250             715.3273    -58.164322      812.5976           46.23105          190.11502    -151.339412      556.8847
+    ## 0            0.000000              0.00000        0.0000     0.0000000            0.00000            0.00000       0.000000      0.000000
+    ## 1            0.000000              0.00000        0.0000     0.0000000            0.00000           17.20042       0.000000      0.000000
+    ## 2            0.000000             64.82341        0.0000     0.0000000            0.00000           82.02383       0.000000      0.000000
+    ## 3            0.000000            108.42198        0.0000     0.0000000            0.00000          127.70689       0.000000      0.000000
+    ## 4            0.000000            109.74790        0.0000     0.0000000            0.00000          129.13179       0.000000      0.000000
+    ## 5            0.000000            358.68449     -263.6077     0.0000000            0.00000          248.91423       0.000000      0.000000
+    ## 6            0.000000            366.08298     -271.7445     0.0000000            0.00000          252.43941       0.000000      0.000000
+    ## 7            0.000000            366.76347     -272.4567     0.3348556            0.00000          252.76247       0.000000      0.000000
+    ## 8           -9.609093            383.90388     -290.6943     8.8490643            0.00000          260.95289       0.000000      0.000000
+    ## 9          -11.563653            387.49033     -294.4106    10.5930123            0.00000          262.64949       0.000000      1.450017
+    ## 10         -33.857531            431.07681     -337.7368    31.4802915            0.00000          281.63097       0.000000      2.471180
+    ## 11         -49.709084            460.72208     -365.6383    48.3218498          -19.24086          295.46870       0.000000      2.290286
+    ## 12         -51.826567            465.10467     -369.4103    50.4850592          -21.70447          297.46606       0.000000      0.000000
+    ## 13         -98.652181            561.48233     -452.5904    98.3357922          -75.07478          341.88624       0.000000      0.000000
+    ## 14        -109.761404            584.32674     -471.6298   110.5165208          -86.82193          351.38257      -7.812286      0.000000
+    ## 15        -127.737612            622.16501     -502.7871   130.2407938         -107.59147          366.29521     -20.801140    -82.249056
     ##    WeekdaySaturday WeekdaySunday WeekdayThursday WeekdayTuesday WeekdayWednesday
-    ## 0          0.00000       0.00000        0.000000        0.00000           0.0000
-    ## 1          0.00000       0.00000        0.000000        0.00000           0.0000
-    ## 2          0.00000       0.00000        0.000000        0.00000           0.0000
-    ## 3          0.00000       0.00000        0.000000        0.00000           0.0000
-    ## 4          0.00000       0.00000        0.000000        0.00000           0.0000
-    ## 5          0.00000      15.76728        0.000000        0.00000           0.0000
-    ## 6          0.00000      21.25706        0.000000        0.00000           0.0000
-    ## 7         28.99886      51.44346        0.000000        0.00000           0.0000
-    ## 8        112.01359     137.34380        0.000000        0.00000           0.0000
-    ## 9        129.09151     154.62991        0.000000        0.00000           0.0000
-    ## 10       130.23795     155.81450        1.258177        0.00000           0.0000
-    ## 11       164.35894     191.80560       41.174412       39.32642           0.0000
-    ## 12       171.66419     199.54596       48.542938       46.63928           0.0000
-    ## 13       276.41809     313.27092      171.675889      166.54379         131.9782
+    ## 0         0.000000      0.000000         0.00000        0.00000         0.000000
+    ## 1         0.000000      0.000000         0.00000        0.00000         0.000000
+    ## 2         0.000000      0.000000         0.00000        0.00000         0.000000
+    ## 3         0.000000      0.000000       -49.06493        0.00000         0.000000
+    ## 4         0.000000      1.332344       -50.42912        0.00000         0.000000
+    ## 5         0.000000    117.879085      -151.07862        0.00000         0.000000
+    ## 6         0.000000    120.729760      -155.26881        0.00000        -4.557634
+    ## 7         0.000000    120.989383      -155.65582        0.00000        -4.979656
+    ## 8         0.000000    127.849068      -165.86894        0.00000       -15.534539
+    ## 9         0.000000    129.502567      -167.52907        0.00000       -17.265485
+    ## 10        0.000000    138.072915      -204.97355      -39.23288       -55.383410
+    ## 11        0.000000    143.363675      -230.41703      -65.99661       -81.056197
+    ## 12       -4.965758    142.552030      -236.49592      -72.27991       -87.126800
+    ## 13      -94.353054    141.777187      -341.55840     -181.83997      -192.279226
+    ## 14     -115.600286    141.630316      -366.83793     -207.90613      -217.599912
+    ## 15     -183.151735    113.504710      -455.44732     -297.81231      -305.832867
 
 ``` r
 lasso_model$bestTune
 ```
 
     ##   fraction
-    ## 1      0.1
+    ## 2      0.5
 
 ### Forward stepwise model
 
@@ -400,16 +412,16 @@ fwdstep_model
 
     ## Generalized Linear Model with Stepwise Feature Selection 
     ## 
-    ## 1472 samples
+    ## 1628 samples
     ##    8 predictor
     ## 
     ## Pre-processing: centered (13), scaled (13) 
     ## Resampling: Cross-Validated (5 fold) 
-    ## Summary of sample sizes: 1177, 1177, 1178, 1178, 1178 
+    ## Summary of sample sizes: 1302, 1303, 1302, 1303, 1302 
     ## Resampling results:
     ## 
     ##   RMSE      Rsquared     MAE     
-    ##   8071.276  0.004286913  3351.775
+    ##   5706.393  0.006130439  2855.705
 
 ## Ensemble models
 
@@ -446,17 +458,17 @@ rf_model
 
     ## Random Forest 
     ## 
-    ## 1472 samples
+    ## 1628 samples
     ##    8 predictor
     ## 
     ## Pre-processing: centered (13), scaled (13) 
     ## Resampling: Cross-Validated (5 fold) 
-    ## Summary of sample sizes: 1177, 1177, 1179, 1177, 1178 
+    ## Summary of sample sizes: 1302, 1302, 1302, 1303, 1303 
     ## Resampling results across tuning parameters:
     ## 
-    ##   mtry  RMSE      Rsquared     MAE     
-    ##   1     7609.380  0.006580823  3297.881
-    ##   2     7720.388  0.009112575  3333.962
+    ##   mtry  RMSE      Rsquared    MAE     
+    ##   1     5726.963  0.01382754  2819.706
+    ##   2     5776.964  0.01167819  2855.799
     ## 
     ## RMSE was used to select the optimal model using the smallest value.
     ## The final value used for the model was mtry = 1.
@@ -481,13 +493,13 @@ gbm_model$bestTune
 ```
 
     ##   n.trees interaction.depth shrinkage n.minobsinnode
-    ## 7      50                 3       0.1             10
+    ## 2     100                 1       0.1             10
 
 ``` r
 plot(gbm_model)
 ```
 
-![](Lifestyle_files/figure-gfm/gbm-1.png)<!-- -->
+![](SocialMedia_files/figure-gfm/gbm-1.png)<!-- -->
 
 As the output suggested, we can use the best tuning information to
 predict our interest. Shrinkage parameter lambda controls the rate at
@@ -529,10 +541,10 @@ performance_table
 ```
 
     ##              Model     RMSE    Rsquared      MAE
-    ## 1            Lasso 9650.057 0.005337779 3285.077
-    ## 2 Forward_Stepwise 9646.664 0.004534141 3246.652
-    ## 3    Random_Forest 9642.975 0.004398112 3189.987
-    ## 4     Boosted_Tree 9746.785 0.002727183 3265.054
+    ## 1            Lasso 4305.609 0.001564210 2446.840
+    ## 2 Forward_Stepwise 4325.524 0.002096831 2457.848
+    ## 3    Random_Forest 4257.850 0.013230522 2404.503
+    ## 4     Boosted_Tree 4298.426 0.009063548 2443.526
 
 ### Best model by RMSE criteria
 
@@ -540,8 +552,8 @@ performance_table
 performance_table %>% slice_min(RMSE)
 ```
 
-    ##           Model     RMSE    Rsquared      MAE
-    ## 1 Random_Forest 9642.975 0.004398112 3189.987
+    ##           Model    RMSE   Rsquared      MAE
+    ## 1 Random_Forest 4257.85 0.01323052 2404.503
 
 ### Best model by Rsquared criteria
 
@@ -549,5 +561,5 @@ performance_table %>% slice_min(RMSE)
 performance_table %>% slice_max(Rsquared)
 ```
 
-    ##   Model     RMSE    Rsquared      MAE
-    ## 1 Lasso 9650.057 0.005337779 3285.077
+    ##           Model    RMSE   Rsquared      MAE
+    ## 1 Random_Forest 4257.85 0.01323052 2404.503
