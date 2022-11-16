@@ -19,7 +19,7 @@ library(rmarkdown)
 
 ## Automation for reports
 ```{r}
-channel <- c("Lifestyle", "Entertainment", "Business", "Socmed", "Tech", "World")
+channel <- c("Lifestyle", "Entertainment", "Bus", "Socmed", "Tech", "World")
 report <- function(channel){
   render("Project3.Rmd", 
          params = list(channel = channel), 
@@ -30,7 +30,7 @@ lapply(channel, report)
 ## Links to each report
 + The analysis for [Lifestyle](Lifestyle.md).
 + The analysis for [Entertainment](Entertainment.md).
-+ The analysis for [Business](Business.md).
-+ The analysis for [Socmed](Socmed.md).
-+ The analysis for [Tech](Tech.md).
++ The analysis for [Business](Bus.md).
++ The analysis for [Social Media](Socmed.md).
++ The analysis for [Technology](Tech.md).
 + The analysis for [World](World.md).

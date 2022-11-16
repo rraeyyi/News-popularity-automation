@@ -1,7 +1,7 @@
 Bus Analysis
 ================
 Rachel Hencher and Yi Ren
-2022-11-14
+2022-11-15
 
 - <a href="#introduction" id="toc-introduction">Introduction</a>
 - <a href="#load-packages" id="toc-load-packages">Load packages</a>
@@ -156,7 +156,10 @@ testing <- news_data[-intrain,]
 ## Numeric summaries
 
 The following table displays five-number summaries for each of the
-numeric variables explored.
+numeric variables explored. This allows us to identify what minimum,
+median, and maximum value for each of our variables, as well as the
+lower and upper quartiles. This can be useful information for
+understanding what our data looks like and how to scale our plots.
 
 ``` r
 stat <- training %>% 
@@ -209,7 +212,10 @@ ggpairs(training_sub)
 
 The following barplot displays counts for how many articles in a
 particular channel were published each day of the week over the time
-frame covered by the data set.
+frame covered by the data set. A higher value on this plot would
+indicate that articles are shared more often on that particular day. It
+would be interesting to compare article shares on weekdays to weekends
+for a given channel.
 
 ``` r
 ggplot(training, aes(x = Weekday)) +
@@ -297,8 +303,8 @@ ggplot(training, aes(x = Negative_Word_Rate, y = Shares)) +
 Throughout this section of the report we utilize two supervised learning
 methods, linear regression and tree models, in order to investigate our
 response, `Shares`. In supervised learning, we often wish to make
-inference on the model or may want to predict the response, which is
-what we will be doing in the next and final section.
+inference on models or we may want to predict the response, which is
+what we will be doing in these next and final sections.
 
 ## Set up cross validation
 
@@ -311,8 +317,13 @@ control <- trainControl(method = "cv", number = 5)
 
 ## Linear regression models
 
-In linear regression, we generate a model where we fit betas by
-minimizing the sum of the squared residuals. Three of the most common
+Linear regression models make sense to explore in this scenario because
+they describe relationships between predictor and response variables,
+which is precisely what our goal is. In linear regression, we generate a
+model where we fit betas, our intercept and slope(s), by minimizing the
+sum of the squared residuals. However, in situations such as this where
+there are many predictors, we do not typically include all predictors in
+the model in order to prevent overfitting. Three of the most common
 variable selection techniques for linear regression are: hypothesis
 testing based methods (forward stepwise, backward stepwise, best subset
 selection), penalization based methods (LASSO, Elastic Net, SCAD), and
