@@ -28,9 +28,9 @@ report <- function(channel){
 lapply(channel, report)
 ```
 ## Links to each report
-+ The analysis for [Lifestyle](Lifestyle.md).
-+ The analysis for [Entertainment](Entertainment.md).
-+ The analysis for [Business](Bus.md).
-+ The analysis for [Social Media](Socmed.md).
-+ The analysis for [Technology](Tech.md).
-+ The analysis for [World](World.md).
++ The analysis for [Lifestyle](Lifestyle.md) articles.
++ The analysis for [Entertainment](Entertainment.md) articles.
++ The analysis for [Business](Bus.md) articles.
++ The analysis for [Social Media](Socmed.md) articles.
++ The analysis for [Technology](Tech.md) articles.
++ The analysis for [World](World.md) articles.
