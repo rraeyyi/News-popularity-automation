@@ -1,7 +1,7 @@
 Technology Analysis
 ================
 Rachel Hencher and Yi Ren
-2022-11-15
+2022-11-16
 
 - <a href="#introduction" id="toc-introduction">Introduction</a>
 - <a href="#load-packages" id="toc-load-packages">Load packages</a>
@@ -285,10 +285,6 @@ ggplot(training, aes(x = Positive_Word_Rate, y = Shares)) +
   xlim(0, 0.125) + ylim(0, 250000) +
   labs(title = "Number of Shares vs Article Positive Word Rate", x = "Positive Word Rate")
 ```
-
-    ## Warning: Removed 1 rows containing non-finite values (stat_cor).
-
-    ## Warning: Removed 1 rows containing missing values (geom_point).
 
 ![](Technology_files/figure-gfm/scatterplot2-1.png)<!-- -->
 
